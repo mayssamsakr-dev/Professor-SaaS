@@ -127,9 +127,8 @@ export default function HomePage(){
 
     borderBottom:"1px solid #eee",
 
-    flexWrap:"wrap",
+    flexWrap:isMobile ? "wrap" : "nowrap",
 
-    gap:10
 
   }}
 
@@ -151,9 +150,18 @@ export default function HomePage(){
 
   direction={isMobile ? "vertical" : "horizontal"}
 
-  style={{ width:"100%" }}
+  size={isMobile ? 8 : 12}
+
+  style={{
+
+    marginTop: isMobile ? 8 : 0,
+
+    alignItems: isMobile ? "stretch" : "center"
+
+  }}
 
 >
+
 
             <Button
 
