@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import AppLayout from "../layouts/AppLayout";
 import { subjectApi } from "../api/subjectApi";
+import { Grid } from "antd";
 
 import {
   Card,
@@ -14,6 +15,10 @@ import {
 } from "antd";
 
 export default function SubjectsPage() {
+
+  const screens = Grid.useBreakpoint();
+
+const isMobile = !screens.md;
 
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -248,13 +253,21 @@ export default function SubjectsPage() {
 
     <AppLayout>
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: 20
-        }}
-      >
+      <Space
+
+  direction={isMobile ? "vertical" : "horizontal"}
+
+  style={{
+
+    width:"100%",
+
+    justifyContent:"space-between",
+
+    marginBottom:20
+
+  }}
+
+>
 
         <h2>
 
@@ -264,6 +277,7 @@ export default function SubjectsPage() {
 
         <Button
           type="primary"
+          block={isMobile}
           onClick={openNew}
         >
 
@@ -271,7 +285,7 @@ export default function SubjectsPage() {
 
         </Button>
 
-      </div>
+      </Space>
 
       <Card>
 
@@ -280,6 +294,7 @@ export default function SubjectsPage() {
           columns={columns}
           rowKey="id"
           loading={loading}
+          scroll={{ x:true }}
         />
 
       </Card>

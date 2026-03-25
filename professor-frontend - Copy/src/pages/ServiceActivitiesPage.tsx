@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
 import AppLayout from "../layouts/AppLayout";
 
-import { teachingSessionApi } from "../api/teachingSessionApi";
-import { universitySubjectApi } from "../api/universitySubjectApi";
+import { serviceActivityApi } from "../api/serviceActivityApi";
 import { universityApi } from "../api/universityApi";
+import { serviceTypeApi } from "../api/serviceTypeApi";
 
 import { formatDate } from "../utils/format";
-import dayjs from "dayjs";
-import { Grid } from "antd";
 
 import {
   Card,
@@ -22,16 +20,14 @@ import {
   Space
 } from "antd";
 
-export default function TeachingSessionsPage() {
+import dayjs from "dayjs";
 
-  const screens = Grid.useBreakpoint();
-
-const isMobile = !screens.md;
+export default function ServiceActivitiesPage() {
 
   const [data, setData] = useState<any[]>([]);
 
   const [universities, setUniversities] = useState<any[]>([]);
-  const [links, setLinks] = useState<any[]>([]);
+  const [types, setTypes] = useState<any[]>([]);
 
   const [loading, setLoading] = useState(false);
 
@@ -56,14 +52,18 @@ const isMobile = !screens.md;
     try {
 
       const res =
-        await teachingSessionApi.getAll();
+        await serviceActivityApi.getAll();
 
       setData(res);
 
       const u =
         await universityApi.getAll();
 
+      const t =
+        await serviceTypeApi.getAll();
+
       setUniversities(u);
+      setTypes(t);
 
     } catch (error:any) {
 
@@ -80,24 +80,6 @@ const isMobile = !screens.md;
   };
 
   /*
-  تحميل المواد حسب الجامعة
-  */
-  const loadLinks = async (
-
-    universityId: number
-
-  ) => {
-
-    const res =
-      await universitySubjectApi.getByUniversity(
-        universityId
-      );
-
-    setLinks(res);
-
-  };
-
-  /*
   create
   */
   const openNew = () => {
@@ -105,8 +87,6 @@ const isMobile = !screens.md;
     setEditing(null);
 
     form.resetFields();
-
-    setLinks([]);
 
     setModalOpen(true);
 
@@ -120,9 +100,7 @@ const isMobile = !screens.md;
     if (record.invoiceId) {
 
       message.warning(
-
-        "Session already invoiced"
-
+        "Activity already invoiced"
       );
 
       return;
@@ -144,26 +122,26 @@ const isMobile = !screens.md;
 
         setEditing(record);
 
-        const universityId =
-          record.universitySubject
-            .university.id;
+form.setFieldsValue({
 
-        loadLinks(universityId);
+  universityId:
+    Number(record.universityId),
 
-        form.setFieldsValue({
+  serviceTypeId:
+    Number(record.serviceTypeId),
 
-          universityId,
+  quantity:
+    record.quantity
+      ? Number(record.quantity)
+      : undefined,
 
-          universitySubjectId:
-            record.universitySubjectId,
+  unitRate:
+    Number(record.unitRate),
 
-          quantity:
-            record.quantity,
+  date:
+    dayjs(record.date)
 
-          date:
-            dayjs(record.date)
-
-        });
+});
 
         setModalOpen(true);
 
@@ -185,11 +163,7 @@ const isMobile = !screens.md;
 
       const payload = {
 
-        universitySubjectId:
-          values.universitySubjectId,
-
-        quantity:
-          values.quantity,
+        ...values,
 
         date:
           values.date.format(
@@ -200,7 +174,7 @@ const isMobile = !screens.md;
 
       if (editing) {
 
-        await teachingSessionApi.update(
+        await serviceActivityApi.update(
 
           editing.id,
 
@@ -209,17 +183,17 @@ const isMobile = !screens.md;
         );
 
         message.success(
-          "Session updated"
+          "Activity updated"
         );
 
       } else {
 
-        await teachingSessionApi.create(
+        await serviceActivityApi.create(
           payload
         );
 
         message.success(
-          "Session created"
+          "Activity created"
         );
 
       }
@@ -232,7 +206,7 @@ const isMobile = !screens.md;
 
       const msg =
         error?.response?.data?.message ||
-        "Error saving";
+        "Error saving activity";
 
       message.error(msg);
 
@@ -248,9 +222,7 @@ const isMobile = !screens.md;
     if (record.invoiceId) {
 
       message.warning(
-
-        "Session already invoiced"
-
+        "Activity already invoiced"
       );
 
       return;
@@ -259,7 +231,7 @@ const isMobile = !screens.md;
 
     Modal.confirm({
 
-      title: "Delete session",
+      title: "Delete activity",
 
       content:
         "Delete only allowed if not invoiced.",
@@ -274,12 +246,12 @@ const isMobile = !screens.md;
 
         try {
 
-          await teachingSessionApi.delete(
+          await serviceActivityApi.delete(
             record.id
           );
 
           message.success(
-            "Session deleted"
+            "Activity deleted"
           );
 
           loadData();
@@ -288,7 +260,7 @@ const isMobile = !screens.md;
 
           const msg =
             error?.response?.data?.message ||
-            "Cannot delete session";
+            "Cannot delete activity";
 
           message.error(msg);
 
@@ -316,15 +288,15 @@ const isMobile = !screens.md;
       title: "University",
 
       render: (_: any, r: any) =>
-        r.universitySubject?.university?.name
+        r.university?.name
 
     },
 
     {
-      title: "Subject",
+      title: "Type",
 
       render: (_: any, r: any) =>
-        r.universitySubject?.subject?.name
+        r.serviceType?.name
 
     },
 
@@ -383,39 +355,30 @@ const isMobile = !screens.md;
 
     <AppLayout>
 
-      <Space
-
-  direction={isMobile ? "vertical" : "horizontal"}
-
-  style={{
-
-    width:"100%",
-
-    justifyContent:"space-between",
-
-    marginBottom:20
-
-  }}
-
->
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: 20
+        }}
+      >
 
         <h2>
 
-          Teaching Sessions
+          Service Activities
 
         </h2>
 
         <Button
           type="primary"
-          block={isMobile}
           onClick={openNew}
         >
 
-          New Session
+          New Activity
 
         </Button>
 
-      </Space>
+      </div>
 
       <Card>
 
@@ -424,7 +387,6 @@ const isMobile = !screens.md;
           columns={columns}
           rowKey="id"
           loading={loading}
-          scroll={{ x:true }}
         />
 
       </Card>
@@ -433,8 +395,8 @@ const isMobile = !screens.md;
 
         title={
           editing
-            ? "Edit Session"
-            : "New Session"
+            ? "Edit Activity"
+            : "New Activity"
         }
 
         open={modalOpen}
@@ -458,10 +420,7 @@ const isMobile = !screens.md;
             rules={[{ required: true }]}
           >
 
-            <Select
-              onChange={loadLinks}
-              disabled={editing}
-            >
+            <Select>
 
               {universities.map(u => (
 
@@ -481,21 +440,21 @@ const isMobile = !screens.md;
           </Form.Item>
 
           <Form.Item
-            label="Subject"
-            name="universitySubjectId"
+            label="Activity Type"
+            name="serviceTypeId"
             rules={[{ required: true }]}
           >
 
             <Select>
 
-              {links.map(l => (
+              {types.map(t => (
 
                 <Select.Option
-                  key={l.id}
-                  value={l.id}
+                  key={t.id}
+                  value={t.id}
                 >
 
-                  {l.subject.name}
+                  {t.name}
 
                 </Select.Option>
 
@@ -520,6 +479,18 @@ const isMobile = !screens.md;
           <Form.Item
             label="Quantity"
             name="quantity"
+          >
+
+            <InputNumber
+              style={{ width: "100%" }}
+              min={0.01}
+            />
+
+          </Form.Item>
+
+          <Form.Item
+            label="Unit Rate"
+            name="unitRate"
             rules={[{ required: true }]}
           >
 

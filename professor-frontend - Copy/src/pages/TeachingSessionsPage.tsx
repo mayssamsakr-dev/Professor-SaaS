@@ -7,7 +7,6 @@ import { universityApi } from "../api/universityApi";
 
 import { formatDate } from "../utils/format";
 import dayjs from "dayjs";
-import { Grid } from "antd";
 
 import {
   Card,
@@ -23,10 +22,6 @@ import {
 } from "antd";
 
 export default function TeachingSessionsPage() {
-
-  const screens = Grid.useBreakpoint();
-
-const isMobile = !screens.md;
 
   const [data, setData] = useState<any[]>([]);
 
@@ -383,21 +378,13 @@ const isMobile = !screens.md;
 
     <AppLayout>
 
-      <Space
-
-  direction={isMobile ? "vertical" : "horizontal"}
-
-  style={{
-
-    width:"100%",
-
-    justifyContent:"space-between",
-
-    marginBottom:20
-
-  }}
-
->
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: 20
+        }}
+      >
 
         <h2>
 
@@ -407,7 +394,6 @@ const isMobile = !screens.md;
 
         <Button
           type="primary"
-          block={isMobile}
           onClick={openNew}
         >
 
@@ -415,7 +401,7 @@ const isMobile = !screens.md;
 
         </Button>
 
-      </Space>
+      </div>
 
       <Card>
 
@@ -424,7 +410,6 @@ const isMobile = !screens.md;
           columns={columns}
           rowKey="id"
           loading={loading}
-          scroll={{ x:true }}
         />
 
       </Card>

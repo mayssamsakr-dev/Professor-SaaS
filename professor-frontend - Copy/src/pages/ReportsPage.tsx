@@ -61,9 +61,9 @@ export default function ReportsPage() {
 
 
       {/* KPI */}
-      <Row gutter={[16,16]} style={{ marginBottom: 20 }}>
+      <Row gutter={16} style={{ marginBottom: 20 }}>
 
-        <Col xs={24} sm={12} md={12} lg={6}>
+        <Col span={6}>
           <Card>
 
             <div style={{ color: "#6b7280" }}>
@@ -81,7 +81,7 @@ export default function ReportsPage() {
         </Col>
 
 
-        <Col xs={24} sm={12} md={12} lg={6}>
+        <Col span={6}>
           <Card>
 
             <div style={{ color: "#6b7280" }}>
@@ -99,7 +99,7 @@ export default function ReportsPage() {
         </Col>
 
 
-        <Col xs={24} sm={12} md={12} lg={6}>
+        <Col span={6}>
           <Card>
 
             <div style={{ color: "#6b7280" }}>
@@ -117,7 +117,7 @@ export default function ReportsPage() {
         </Col>
 
 
-        <Col xs={24} sm={12} md={12} lg={6}>
+        <Col span={6}>
           <Card>
 
             <div style={{ color: "#6b7280" }}>
@@ -135,9 +135,9 @@ export default function ReportsPage() {
 
 
       {/* Charts */}
-      <Row gutter={[16,16]}>
+      <Row gutter={16}>
 
-        <Col xs={24} lg={12}>
+        <Col span={12}>
 
           <Card title="Revenue by University">
 
@@ -173,7 +173,7 @@ export default function ReportsPage() {
         </Col>
 
 
-        <Col xs={24} lg={12}>
+        <Col span={12}>
 
           <Card title="Monthly Revenue">
 

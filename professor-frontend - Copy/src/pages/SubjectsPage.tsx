@@ -1,32 +1,21 @@
 import { useEffect, useState } from "react";
 import AppLayout from "../layouts/AppLayout";
-
-import { universitySubjectApi } from "../api/universitySubjectApi";
-import { universityApi } from "../api/universityApi";
 import { subjectApi } from "../api/subjectApi";
-import { Grid } from "antd";
+
 import {
   Card,
   Table,
   Button,
-  Modal,
   Form,
-  Select,
-  InputNumber,
+  Input,
+  Modal,
   message,
   Space
 } from "antd";
 
-export default function UniversitySubjectsPage() {
-
-    const screens = Grid.useBreakpoint();
-
-const isMobile = !screens.md;
+export default function SubjectsPage() {
 
   const [data, setData] = useState<any[]>([]);
-  const [universities, setUniversities] = useState<any[]>([]);
-  const [subjects, setSubjects] = useState<any[]>([]);
-
   const [loading, setLoading] = useState(false);
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -50,19 +39,9 @@ const isMobile = !screens.md;
     try {
 
       const res =
-        await universitySubjectApi.getAll();
-
-      setData(res);
-
-      const u =
-        await universityApi.getAll();
-
-      const s =
         await subjectApi.getAll();
 
-      setUniversities(u);
-
-      setSubjects(s);
+      setData(res);
 
     } catch (error:any) {
 
@@ -79,7 +58,7 @@ const isMobile = !screens.md;
   };
 
   /*
-  create
+  فتح create
   */
   const openNew = () => {
 
@@ -92,7 +71,8 @@ const isMobile = !screens.md;
   };
 
   /*
-  edit confirmation
+  فتح edit
+  نفس فكرة UniversitiesPage
   */
   const openEdit = (record: any) => {
 
@@ -101,7 +81,7 @@ const isMobile = !screens.md;
       title: "Edit confirmation",
 
       content:
-        "Changing rate will affect future sessions.",
+        "Editing subject name will update it in related lists.",
 
       okText: "Continue",
 
@@ -111,18 +91,7 @@ const isMobile = !screens.md;
 
         setEditing(record);
 
-        form.setFieldsValue({
-
-          universityId:
-            record.university.id,
-
-          subjectId:
-            record.subject.id,
-
-          ratePerSession:
-            record.ratePerSession
-
-        });
+        form.setFieldsValue(record);
 
         setModalOpen(true);
 
@@ -133,7 +102,7 @@ const isMobile = !screens.md;
   };
 
   /*
-  save
+  حفظ
   */
   const handleSave = async () => {
 
@@ -144,26 +113,26 @@ const isMobile = !screens.md;
 
       if (editing) {
 
-        await universitySubjectApi.update(
+        await subjectApi.update(
 
           editing.id,
 
-          values.ratePerSession
+          values
 
         );
 
         message.success(
-          "Rate updated"
+          "Subject updated"
         );
 
       } else {
 
-        await universitySubjectApi.create(
+        await subjectApi.create(
           values
         );
 
         message.success(
-          "Link created"
+          "Subject created"
         );
 
       }
@@ -176,7 +145,7 @@ const isMobile = !screens.md;
 
       const msg =
         error?.response?.data?.message ||
-        "Error saving";
+        "Error saving subject";
 
       message.error(msg);
 
@@ -185,35 +154,34 @@ const isMobile = !screens.md;
   };
 
   /*
-  delete confirmation
+  حذف
+  نفس فكرة UniversitiesPage
   */
   const handleDelete = (record: any) => {
 
     Modal.confirm({
 
-      title: "Delete link",
+      title: "Delete subject",
 
       content:
-        "Delete only allowed if no teaching sessions exist.",
+        "Delete only allowed if subject has no teaching sessions.",
 
       okText: "Delete",
 
       okButtonProps: { danger: true },
 
-      cancelText: "Cancel",
-
       onOk: async () => {
 
         try {
 
-          await universitySubjectApi.delete(
+          await subjectApi.delete(
 
             record.id
 
           );
 
           message.success(
-            "Link deleted"
+            "Subject deleted"
           );
 
           loadData();
@@ -222,7 +190,7 @@ const isMobile = !screens.md;
 
           const msg =
             error?.response?.data?.message ||
-            "Cannot delete link";
+            "Cannot delete subject";
 
           message.error(msg);
 
@@ -237,24 +205,13 @@ const isMobile = !screens.md;
   const columns = [
 
     {
-      title: "University",
-
-      dataIndex: ["university", "name"]
-
+      title: "Name",
+      dataIndex: "name"
     },
 
     {
-      title: "Subject",
-
-      dataIndex: ["subject", "name"]
-
-    },
-
-    {
-      title: "Rate / Session",
-
-      dataIndex: "ratePerSession"
-
+      title: "Description",
+      dataIndex: "description"
     },
 
     {
@@ -291,39 +248,30 @@ const isMobile = !screens.md;
 
     <AppLayout>
 
-      <Space
-
-  direction={isMobile ? "vertical" : "horizontal"}
-
-  style={{
-
-    width:"100%",
-
-    justifyContent:"space-between",
-
-    marginBottom:20
-
-  }}
-
->
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: 20
+        }}
+      >
 
         <h2>
 
-          University Subjects
+          Subjects
 
         </h2>
 
         <Button
           type="primary"
-          block={isMobile}
           onClick={openNew}
         >
 
-          New Link
+          New Subject
 
         </Button>
 
-      </Space>
+      </div>
 
       <Card>
 
@@ -332,7 +280,6 @@ const isMobile = !screens.md;
           columns={columns}
           rowKey="id"
           loading={loading}
-          scroll={{ x:true }}
         />
 
       </Card>
@@ -341,8 +288,8 @@ const isMobile = !screens.md;
 
         title={
           editing
-            ? "Edit Rate"
-            : "New Link"
+            ? "Edit Subject"
+            : "New Subject"
         }
 
         open={modalOpen}
@@ -361,69 +308,21 @@ const isMobile = !screens.md;
         >
 
           <Form.Item
-            label="University"
-            name="universityId"
+            label="Name"
+            name="name"
             rules={[{ required: true }]}
           >
 
-            <Select
-              disabled={editing}
-            >
-
-              {universities.map(u => (
-
-                <Select.Option
-                  key={u.id}
-                  value={u.id}
-                >
-
-                  {u.name}
-
-                </Select.Option>
-
-              ))}
-
-            </Select>
+            <Input />
 
           </Form.Item>
 
           <Form.Item
-            label="Subject"
-            name="subjectId"
-            rules={[{ required: true }]}
+            label="Description"
+            name="description"
           >
 
-            <Select
-              disabled={editing}
-            >
-
-              {subjects.map(s => (
-
-                <Select.Option
-                  key={s.id}
-                  value={s.id}
-                >
-
-                  {s.name}
-
-                </Select.Option>
-
-              ))}
-
-            </Select>
-
-          </Form.Item>
-
-          <Form.Item
-            label="Rate per Session"
-            name="ratePerSession"
-            rules={[{ required: true }]}
-          >
-
-            <InputNumber
-              style={{ width: "100%" }}
-              min={0}
-            />
+            <Input />
 
           </Form.Item>
 

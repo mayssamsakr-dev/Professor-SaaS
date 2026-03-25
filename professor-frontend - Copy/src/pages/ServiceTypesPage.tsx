@@ -21,14 +21,10 @@ import AppLayout from "../layouts/AppLayout";
 import {
 apiClient
 } from "../api/client";
-import { Grid } from "antd";
 
 const { Title } = Typography;
 
 export default function ServiceTypesPage(){
-const screens = Grid.useBreakpoint();
-
-const isMobile = !screens.md;
 
 const [data,setData] = useState<any[]>([]);
 
@@ -157,7 +153,6 @@ marginBottom:20
 
 <Button
 type="primary"
-block={isMobile}
 onClick={()=>{
 
 setEditing(null);
@@ -235,7 +230,6 @@ Delete
 }
 
 ]}
-scroll={{ x:true }}
 
 />
 

@@ -6,6 +6,7 @@ import { universityApi } from "../api/universityApi";
 import { serviceTypeApi } from "../api/serviceTypeApi";
 
 import { formatDate } from "../utils/format";
+import { Grid } from "antd";
 
 import {
   Card,
@@ -25,6 +26,9 @@ import dayjs from "dayjs";
 export default function ServiceActivitiesPage() {
 
   const [data, setData] = useState<any[]>([]);
+  const screens = Grid.useBreakpoint();
+
+const isMobile = !screens.md;
 
   const [universities, setUniversities] = useState<any[]>([]);
   const [types, setTypes] = useState<any[]>([]);
@@ -355,13 +359,21 @@ form.setFieldsValue({
 
     <AppLayout>
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: 20
-        }}
-      >
+      <Space
+
+  direction={isMobile ? "vertical" : "horizontal"}
+
+  style={{
+
+    width:"100%",
+
+    justifyContent:"space-between",
+
+    marginBottom:20
+
+  }}
+
+>
 
         <h2>
 
@@ -371,6 +383,7 @@ form.setFieldsValue({
 
         <Button
           type="primary"
+          block={isMobile}
           onClick={openNew}
         >
 
@@ -378,7 +391,7 @@ form.setFieldsValue({
 
         </Button>
 
-      </div>
+      </Space>
 
       <Card>
 
@@ -387,6 +400,7 @@ form.setFieldsValue({
           columns={columns}
           rowKey="id"
           loading={loading}
+          scroll={{ x: true }}
         />
 
       </Card>

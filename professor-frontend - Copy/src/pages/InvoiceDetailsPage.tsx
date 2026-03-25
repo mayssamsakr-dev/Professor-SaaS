@@ -5,7 +5,6 @@ import AppLayout from "../layouts/AppLayout";
 import { apiClient } from "../api/client";
 import { paymentApi } from "../api/paymentApi";
 import { invoiceApi } from "../api/invoiceApi";
-import { Grid } from "antd";
 
 import {
 
@@ -34,9 +33,6 @@ export default function InvoiceDetailsPage() {
 const { id } = useParams();
 
 const [invoice,setInvoice] = useState<any>(null);
-const screens = Grid.useBreakpoint();
-
-const isMobile = !screens.md;
 
 const [payments,setPayments] = useState<any[]>([]);
 
@@ -399,7 +395,6 @@ return(
 <Card>
 
 <Space
-direction={isMobile ? "vertical" : "horizontal"}
 
 style={{
 
@@ -616,7 +611,6 @@ dataSource={sessions}
 rowKey="id"
 
 pagination={false}
-scroll={{ x: true }}
 
 columns={[
 
@@ -707,7 +701,6 @@ dataSource={activities}
 rowKey="id"
 
 pagination={false}
-scroll={{ x: true }}
 
 columns={[
 
@@ -794,7 +787,6 @@ invoice.currency?.code
   rowKey="id"
 
   pagination={false}
-  scroll={{ x: true }}
 
   columns={[
 
@@ -830,7 +822,6 @@ invoice.currency?.code
       <Button
 
         type="primary"
-        block={isMobile}
 
         onClick={() =>
           setAdjustmentOpen(true)
@@ -860,7 +851,6 @@ title="Payments"
 <Table
 
 dataSource={payments}
-scroll={{ x: true }}
 
 columns={paymentColumns}
 
@@ -973,7 +963,6 @@ name="referenceNumber"
 type="primary"
 
 htmlType="submit"
-block={isMobile}
 
 >
 

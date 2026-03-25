@@ -10,8 +10,7 @@ import {
   DatePicker,
   Button,
   Space,
-  Alert,
-  Grid
+  Alert
 } from "antd";
 
 import {
@@ -36,10 +35,6 @@ export default function DashboardPage() {
   const [byUniversity, setByUniversity] = useState<any[]>([]);
   const [dates, setDates] = useState<any>(null);
 
-  const screens = Grid.useBreakpoint();
-
-  const isMobile = !screens.md;
-
   useEffect(() => {
     loadData();
   }, []);
@@ -51,12 +46,9 @@ export default function DashboardPage() {
     let query = "";
 
     if (d) {
-
       const from = d[0].format("YYYY-MM-DD");
       const to = d[1].format("YYYY-MM-DD");
-
       query = `?dateFrom=${from}&dateTo=${to}`;
-
     }
 
     const s = await reportApi.getSummary(query);
@@ -88,195 +80,104 @@ export default function DashboardPage() {
     : null;
 
   return (
-
     <AppLayout>
 
       <Title level={4}>Dashboard</Title>
 
       <Card style={{ marginBottom: 20 }}>
-
-        <Space
-
-          direction={isMobile ? "vertical" : "horizontal"}
-
-          style={{ width:"100%" }}
-
-        >
-
-          <RangePicker
-
-  onChange={(val)=>setDates(val)}
-
-  style={{
-    width: isMobile ? "100%" : undefined
-  }}
-
-/>
-
-          <Button
-            type="primary"
-            onClick={handleApply}
-            block={isMobile}
-          >
-
+        <Space>
+          <RangePicker onChange={(val) => setDates(val)} />
+          <Button type="primary" onClick={handleApply}>
             Apply
-
           </Button>
-
         </Space>
-
       </Card>
 
-      <Row gutter={[16,16]} style={{ marginBottom: 20 }}>
+      <Row gutter={16} style={{ marginBottom: 20 }}>
 
-        <Col xs={24} sm={12} md={12} lg={6}>
-
+        <Col span={6}>
           <Card>
-
             <Text>Total Revenue</Text>
-
             <Title level={4}>
-
-              {summary
-                ? formatCurrency(summary.totalRevenue, "USD")
-                : "-"}
-
+              {summary ? formatCurrency(summary.totalRevenue, "USD") : "-"}
             </Title>
-
           </Card>
-
         </Col>
 
-        <Col xs={24} sm={12} md={12} lg={6}>
-
+        <Col span={6}>
           <Card>
-
             <Text>Paid %</Text>
-
             <Title level={4}>
-
               {paidPercent.toFixed(1)}%
-
             </Title>
-
           </Card>
-
         </Col>
 
-        <Col xs={24} sm={12} md={12} lg={6}>
-
+        <Col span={6}>
           <Card>
-
             <Text>Outstanding</Text>
-
             <Title level={4}>
-
               {summary
                 ? formatCurrency(summary.unpaidRevenue, "USD")
                 : "-"}
-
             </Title>
-
           </Card>
-
         </Col>
 
-        <Col xs={24} sm={12} md={12} lg={6}>
-
+        <Col span={6}>
           <Card>
-
             <Text>Avg Invoice</Text>
-
             <Title level={4}>
-
               {formatCurrency(avgInvoice, "USD")}
-
             </Title>
-
           </Card>
-
         </Col>
 
       </Row>
 
-      <Row gutter={[16,16]} style={{ marginBottom: 20 }}>
+      <Row gutter={16} style={{ marginBottom: 20 }}>
 
-        <Col xs={24} md={12}>
-
+        <Col span={12}>
           <Card title="Top University">
-
             {topUniversity
-
-              ? `${topUniversity.universityName}
-                 (${formatCurrency(topUniversity.total, "USD")})`
-
+              ? `${topUniversity.universityName} (${formatCurrency(topUniversity.total, "USD")})`
               : "No data"}
-
           </Card>
-
         </Col>
 
-        <Col xs={24} md={12}>
-
+        <Col span={12}>
           <Card title="Best Month">
-
             {bestMonth
-
-              ? `${bestMonth.month}
-                 (${formatCurrency(bestMonth.total, "USD")})`
-
+              ? `${bestMonth.month} (${formatCurrency(bestMonth.total, "USD")})`
               : "No data"}
-
           </Card>
-
         </Col>
 
       </Row>
 
       {summary && summary.unpaidRevenue > 0 && (
-
         <Alert
-
           type="warning"
-
           message="Unpaid invoices detected"
-
-          description={`Outstanding:
-            ${formatCurrency(summary.unpaidRevenue, "USD")}`}
-
+          description={`Outstanding: ${formatCurrency(summary.unpaidRevenue, "USD")}`}
           style={{ marginBottom: 20 }}
-
         />
-
       )}
 
       <Card title="Revenue Trend">
 
         <ResponsiveContainer width="100%" height={300}>
-
           <LineChart data={monthly}>
-
             <CartesianGrid strokeDasharray="3 3" />
-
             <XAxis dataKey="month" />
-
             <YAxis />
-
             <Tooltip />
-
-            <Line
-              type="monotone"
-              dataKey="total"
-            />
-
+            <Line type="monotone" dataKey="total" />
           </LineChart>
-
         </ResponsiveContainer>
 
       </Card>
 
     </AppLayout>
-
   );
-
 }

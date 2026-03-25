@@ -16,13 +16,8 @@ import {
   Space,
   Select
 } from "antd";
-import { Grid } from "antd";
 
 export default function UniversitiesPage(){
-
-    const screens = Grid.useBreakpoint();
-
-const isMobile = !screens.md;
 
   const [data,setData] =
     useState<any[]>([]);
@@ -337,21 +332,19 @@ const isMobile = !screens.md;
 
     <AppLayout>
 
-      <Space
+      <div
 
-  direction={isMobile ? "vertical" : "horizontal"}
+        style={{
 
-  style={{
+          display:"flex",
 
-    width:"100%",
+          justifyContent:"space-between",
 
-    justifyContent:"space-between",
+          marginBottom:20
 
-    marginBottom:20
+        }}
 
-  }}
-
->
+      >
 
         <h2>
 
@@ -361,7 +354,6 @@ const isMobile = !screens.md;
 
         <Button
           type="primary"
-          block={isMobile}
           onClick={openNew}
         >
 
@@ -369,7 +361,7 @@ const isMobile = !screens.md;
 
         </Button>
 
-      </Space>
+      </div>
 
 
       <Card>
@@ -383,7 +375,6 @@ const isMobile = !screens.md;
           rowKey="id"
 
           loading={loading}
-          scroll={{ x:true }}
 
         />
 
@@ -415,7 +406,7 @@ const isMobile = !screens.md;
 
           <Row gutter={16}>
 
-            <Col xs={24} md={12}>
+            <Col span={12}>
 
               <Form.Item
                 label="Name"
@@ -430,7 +421,7 @@ const isMobile = !screens.md;
             </Col>
 
 
-            <Col xs={24} md={12}>
+            <Col span={12}>
 
               <Form.Item
                 label="Currency"
@@ -474,7 +465,7 @@ const isMobile = !screens.md;
 
           <Row gutter={16}>
 
-            <Col xs={24} md={12}>
+            <Col span={12}>
 
               <Form.Item
                 label="City"
@@ -488,7 +479,7 @@ const isMobile = !screens.md;
             </Col>
 
 
-            <Col xs={24} md={12}>
+            <Col span={12}>
 
               <Form.Item
                 label="Country"
@@ -506,7 +497,7 @@ const isMobile = !screens.md;
 
           <Row gutter={16}>
 
-            <Col xs={24} md={12}>
+            <Col span={12}>
 
               <Form.Item
                 label="Registration #"
@@ -520,7 +511,7 @@ const isMobile = !screens.md;
             </Col>
 
 
-            <Col xs={24} md={12}>
+            <Col span={12}>
 
               <Form.Item
                 label="Tax #"
@@ -538,7 +529,7 @@ const isMobile = !screens.md;
 
           <Row gutter={16}>
 
-            <Col xs={24} md={12}>
+            <Col span={12}>
 
               <Form.Item
                 label="Email"
@@ -552,7 +543,7 @@ const isMobile = !screens.md;
             </Col>
 
 
-            <Col xs={24} md={12}>
+            <Col span={12}>
 
               <Form.Item
                 label="Phone"

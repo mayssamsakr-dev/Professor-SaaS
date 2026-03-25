@@ -1,13 +1,9 @@
 import { useEffect, useState } from "react";
 import AppLayout from "../layouts/AppLayout";
 
-import { teachingSessionApi } from "../api/teachingSessionApi";
 import { universitySubjectApi } from "../api/universitySubjectApi";
 import { universityApi } from "../api/universityApi";
-
-import { formatDate } from "../utils/format";
-import dayjs from "dayjs";
-import { Grid } from "antd";
+import { subjectApi } from "../api/subjectApi";
 
 import {
   Card,
@@ -16,22 +12,16 @@ import {
   Modal,
   Form,
   Select,
-  DatePicker,
   InputNumber,
   message,
   Space
 } from "antd";
 
-export default function TeachingSessionsPage() {
-
-  const screens = Grid.useBreakpoint();
-
-const isMobile = !screens.md;
+export default function UniversitySubjectsPage() {
 
   const [data, setData] = useState<any[]>([]);
-
   const [universities, setUniversities] = useState<any[]>([]);
-  const [links, setLinks] = useState<any[]>([]);
+  const [subjects, setSubjects] = useState<any[]>([]);
 
   const [loading, setLoading] = useState(false);
 
@@ -56,14 +46,19 @@ const isMobile = !screens.md;
     try {
 
       const res =
-        await teachingSessionApi.getAll();
+        await universitySubjectApi.getAll();
 
       setData(res);
 
       const u =
         await universityApi.getAll();
 
+      const s =
+        await subjectApi.getAll();
+
       setUniversities(u);
+
+      setSubjects(s);
 
     } catch (error:any) {
 
@@ -80,24 +75,6 @@ const isMobile = !screens.md;
   };
 
   /*
-  تحميل المواد حسب الجامعة
-  */
-  const loadLinks = async (
-
-    universityId: number
-
-  ) => {
-
-    const res =
-      await universitySubjectApi.getByUniversity(
-        universityId
-      );
-
-    setLinks(res);
-
-  };
-
-  /*
   create
   */
   const openNew = () => {
@@ -105,8 +82,6 @@ const isMobile = !screens.md;
     setEditing(null);
 
     form.resetFields();
-
-    setLinks([]);
 
     setModalOpen(true);
 
@@ -117,24 +92,12 @@ const isMobile = !screens.md;
   */
   const openEdit = (record: any) => {
 
-    if (record.invoiceId) {
-
-      message.warning(
-
-        "Session already invoiced"
-
-      );
-
-      return;
-
-    }
-
     Modal.confirm({
 
       title: "Edit confirmation",
 
       content:
-        "Changes will affect future invoices only.",
+        "Changing rate will affect future sessions.",
 
       okText: "Continue",
 
@@ -144,24 +107,16 @@ const isMobile = !screens.md;
 
         setEditing(record);
 
-        const universityId =
-          record.universitySubject
-            .university.id;
-
-        loadLinks(universityId);
-
         form.setFieldsValue({
 
-          universityId,
+          universityId:
+            record.university.id,
 
-          universitySubjectId:
-            record.universitySubjectId,
+          subjectId:
+            record.subject.id,
 
-          quantity:
-            record.quantity,
-
-          date:
-            dayjs(record.date)
+          ratePerSession:
+            record.ratePerSession
 
         });
 
@@ -183,43 +138,28 @@ const isMobile = !screens.md;
       const values =
         await form.validateFields();
 
-      const payload = {
-
-        universitySubjectId:
-          values.universitySubjectId,
-
-        quantity:
-          values.quantity,
-
-        date:
-          values.date.format(
-            "YYYY-MM-DD"
-          )
-
-      };
-
       if (editing) {
 
-        await teachingSessionApi.update(
+        await universitySubjectApi.update(
 
           editing.id,
 
-          payload
+          values.ratePerSession
 
         );
 
         message.success(
-          "Session updated"
+          "Rate updated"
         );
 
       } else {
 
-        await teachingSessionApi.create(
-          payload
+        await universitySubjectApi.create(
+          values
         );
 
         message.success(
-          "Session created"
+          "Link created"
         );
 
       }
@@ -245,24 +185,12 @@ const isMobile = !screens.md;
   */
   const handleDelete = (record: any) => {
 
-    if (record.invoiceId) {
-
-      message.warning(
-
-        "Session already invoiced"
-
-      );
-
-      return;
-
-    }
-
     Modal.confirm({
 
-      title: "Delete session",
+      title: "Delete link",
 
       content:
-        "Delete only allowed if not invoiced.",
+        "Delete only allowed if no teaching sessions exist.",
 
       okText: "Delete",
 
@@ -274,12 +202,14 @@ const isMobile = !screens.md;
 
         try {
 
-          await teachingSessionApi.delete(
+          await universitySubjectApi.delete(
+
             record.id
+
           );
 
           message.success(
-            "Session deleted"
+            "Link deleted"
           );
 
           loadData();
@@ -288,7 +218,7 @@ const isMobile = !screens.md;
 
           const msg =
             error?.response?.data?.message ||
-            "Cannot delete session";
+            "Cannot delete link";
 
           message.error(msg);
 
@@ -303,49 +233,23 @@ const isMobile = !screens.md;
   const columns = [
 
     {
-      title: "Date",
-
-      dataIndex: "date",
-
-      render: (v: string) =>
-        formatDate(v)
-
-    },
-
-    {
       title: "University",
 
-      render: (_: any, r: any) =>
-        r.universitySubject?.university?.name
+      dataIndex: ["university", "name"]
 
     },
 
     {
       title: "Subject",
 
-      render: (_: any, r: any) =>
-        r.universitySubject?.subject?.name
+      dataIndex: ["subject", "name"]
 
     },
 
     {
-      title: "Qty",
+      title: "Rate / Session",
 
-      dataIndex: "quantity"
-
-    },
-
-    {
-      title: "Rate",
-
-      dataIndex: "unitRate"
-
-    },
-
-    {
-      title: "Total",
-
-      dataIndex: "totalAmount"
+      dataIndex: "ratePerSession"
 
     },
 
@@ -364,8 +268,8 @@ const isMobile = !screens.md;
           </Button>
 
           <Button
-            size="small"
             danger
+            size="small"
             onClick={() => handleDelete(record)}
           >
             Delete
@@ -383,39 +287,30 @@ const isMobile = !screens.md;
 
     <AppLayout>
 
-      <Space
-
-  direction={isMobile ? "vertical" : "horizontal"}
-
-  style={{
-
-    width:"100%",
-
-    justifyContent:"space-between",
-
-    marginBottom:20
-
-  }}
-
->
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: 20
+        }}
+      >
 
         <h2>
 
-          Teaching Sessions
+          University Subjects
 
         </h2>
 
         <Button
           type="primary"
-          block={isMobile}
           onClick={openNew}
         >
 
-          New Session
+          New Link
 
         </Button>
 
-      </Space>
+      </div>
 
       <Card>
 
@@ -424,7 +319,6 @@ const isMobile = !screens.md;
           columns={columns}
           rowKey="id"
           loading={loading}
-          scroll={{ x:true }}
         />
 
       </Card>
@@ -433,8 +327,8 @@ const isMobile = !screens.md;
 
         title={
           editing
-            ? "Edit Session"
-            : "New Session"
+            ? "Edit Rate"
+            : "New Link"
         }
 
         open={modalOpen}
@@ -459,7 +353,6 @@ const isMobile = !screens.md;
           >
 
             <Select
-              onChange={loadLinks}
               disabled={editing}
             >
 
@@ -482,20 +375,22 @@ const isMobile = !screens.md;
 
           <Form.Item
             label="Subject"
-            name="universitySubjectId"
+            name="subjectId"
             rules={[{ required: true }]}
           >
 
-            <Select>
+            <Select
+              disabled={editing}
+            >
 
-              {links.map(l => (
+              {subjects.map(s => (
 
                 <Select.Option
-                  key={l.id}
-                  value={l.id}
+                  key={s.id}
+                  value={s.id}
                 >
 
-                  {l.subject.name}
+                  {s.name}
 
                 </Select.Option>
 
@@ -506,26 +401,14 @@ const isMobile = !screens.md;
           </Form.Item>
 
           <Form.Item
-            label="Date"
-            name="date"
-            rules={[{ required: true }]}
-          >
-
-            <DatePicker
-              style={{ width: "100%" }}
-            />
-
-          </Form.Item>
-
-          <Form.Item
-            label="Quantity"
-            name="quantity"
+            label="Rate per Session"
+            name="ratePerSession"
             rules={[{ required: true }]}
           >
 
             <InputNumber
               style={{ width: "100%" }}
-              min={0.01}
+              min={0}
             />
 
           </Form.Item>

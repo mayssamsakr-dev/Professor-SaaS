@@ -5,7 +5,6 @@ import AppLayout from "../layouts/AppLayout";
 
 import { invoiceApi } from "../api/invoiceApi";
 import { universityApi } from "../api/universityApi";
-import { Grid } from "antd";
 
 import {
 
@@ -31,10 +30,6 @@ import {
 export default function InvoicesPage() {
 
   const navigate = useNavigate();
-
-  const screens = Grid.useBreakpoint();
-
-const isMobile = !screens.md;
 
   const [data, setData] = useState<any[]>([]);
   const [universities, setUniversities] = useState<any[]>([]);
@@ -332,7 +327,6 @@ Delete
       {/* header */}
 
       <Row
-        gutter={[16,16]}
         justify="space-between"
         align="middle"
         style={{ marginBottom: 20 }}
@@ -347,8 +341,6 @@ Delete
         <Button
 
           type="primary"
-
-          block={isMobile}
 
           onClick={() =>
 
@@ -372,15 +364,7 @@ Delete
 
       <Card style={{ marginBottom: 20 }}>
 
-        <Space
-
-  direction={isMobile ? "vertical" : "horizontal"}
-
-  size="large"
-
-  style={{ width:"100%" }}
-
->
+        <Space size="large">
 
           <Select
 
@@ -388,9 +372,7 @@ Delete
 
             allowClear
 
-            style={{
-  width: isMobile ? "100%" : 220
-}}
+            style={{ width: 220 }}
 
             onChange={(value) =>
 
@@ -436,9 +418,7 @@ Delete
 
             allowClear
 
-            style={{
-  width: isMobile ? "100%" : 160
-}}
+            style={{ width: 160 }}
 
             onChange={(value) =>
 
@@ -477,8 +457,6 @@ Delete
       <Card>
 
         <Table
-
-            scroll={{ x: true }}
 
           dataSource={data}
 

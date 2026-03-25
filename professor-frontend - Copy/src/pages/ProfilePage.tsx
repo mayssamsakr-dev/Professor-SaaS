@@ -22,16 +22,12 @@ tenantApi
 } from "../api/tenantApi";
 
 import AppLayout from "../layouts/AppLayout";
-import { Grid } from "antd";
 
 const { Title } = Typography;
 
 export default function ProfilePage(){
 
 const [form] = Form.useForm();
-const screens = Grid.useBreakpoint();
-
-const isMobile = !screens.md;
 
 const [editing,setEditing] =
 useState(false);
@@ -81,7 +77,6 @@ return(
 <Card style={{maxWidth:900}}>
 
 <Space
-direction={isMobile ? "vertical" : "horizontal"}
 style={{
 width:"100%",
 justifyContent:"space-between",
@@ -117,7 +112,7 @@ onFinish={save}
 
 <Row gutter={16}>
 
-<Col xs={24} md={12}>
+<Col span={12}>
 
 <Form.Item
 name="legalName"
@@ -130,7 +125,7 @@ label="Legal Name"
 
 </Col>
 
-<Col xs={24} md={12}>
+<Col span={12}>
 
 <Form.Item
 name="displayName"
@@ -186,7 +181,7 @@ label="Address"
 
 <Row gutter={16}>
 
-<Col xs={24} md={8}>
+<Col span={8}>
 
 <Form.Item
 name="city"
@@ -199,7 +194,7 @@ label="City"
 
 </Col>
 
-<Col xs={24} md={8}>
+<Col span={8}>
 
 <Form.Item
 name="country"
@@ -212,7 +207,7 @@ label="Country"
 
 </Col>
 
-<Col xs={24} md={8}>
+<Col span={8}>
 
 <Form.Item
 name="taxNumber"
@@ -235,7 +230,7 @@ Bank Details
 
 <Row gutter={16}>
 
-<Col xs={24} md={12}>
+<Col span={12}>
 
 <Form.Item
 name="bankName"
@@ -265,7 +260,7 @@ label="IBAN"
 
 <Row gutter={16}>
 
-<Col xs={24} md={12}>
+<Col span={12}>
 
 <Form.Item
 name="swiftCode"
@@ -288,7 +283,7 @@ VAT
 
 <Row gutter={16}>
 
-<Col xs={24} md={8}>
+<Col span={8}>
 
 <Form.Item
 name="vatEnabled"
@@ -323,10 +318,7 @@ disabled={!editing}
 {
 editing && (
 
-<Space
-direction={isMobile ? "vertical" : "horizontal"}
-style={{width:"100%"}}
->
+<Space>
 
 <Button
 onClick={cancel}
@@ -337,7 +329,6 @@ Cancel
 <Button
 type="primary"
 htmlType="submit"
-block={isMobile}
 >
 Save
 </Button>

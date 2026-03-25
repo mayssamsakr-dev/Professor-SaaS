@@ -16,8 +16,7 @@ import {
   Space,
   message,
   InputNumber,
-  Alert,
-  Grid
+  Alert
 } from "antd";
 
 const { Title, Text } = Typography;
@@ -26,11 +25,9 @@ export default function CreateInvoicePage(){
 
   const navigate = useNavigate();
 
+  
+
   const [form] = Form.useForm();
-
-  const screens = Grid.useBreakpoint();
-
-  const isMobile = !screens.md;
 
   const [universities,setUniversities] =
     useState<any[]>([]);
@@ -41,6 +38,7 @@ export default function CreateInvoicePage(){
   const [preview,setPreview] =
     useState<any>(null);
 
+
   useEffect(()=>{
 
     loadUniversities();
@@ -48,6 +46,11 @@ export default function CreateInvoicePage(){
     loadCurrencies();
 
   },[]);
+
+
+  /*
+  load universities
+  */
 
   const loadUniversities = async()=>{
 
@@ -58,6 +61,11 @@ export default function CreateInvoicePage(){
 
   };
 
+
+  /*
+  load currencies
+  */
+
   const loadCurrencies = async()=>{
 
     const data =
@@ -67,18 +75,30 @@ export default function CreateInvoicePage(){
 
   };
 
+
+  /*
+  preview totals
+  */
+
   const loadPreview = async()=>{
 
     const values =
       form.getFieldsValue();
 
     if(
+
       !values.universityId ||
+
       !values.period ||
+
       !values.currencyId
+
     ){
+
       setPreview(null);
+
       return;
+
     }
 
     try{
@@ -101,12 +121,13 @@ export default function CreateInvoicePage(){
             values.currencyId,
 
           exchangeRateToBase:
+
             values.exchangeRateToBase
               ? Number(values.exchangeRateToBase)
               : 1
 
         });
-
+        
       setPreview(res);
 
     }
@@ -118,6 +139,12 @@ export default function CreateInvoicePage(){
 
   };
 
+
+  /*
+  when university changes
+  auto set default currency
+  */
+
   const handleUniversityChange = (id:number)=>{
 
     const uni =
@@ -128,8 +155,11 @@ export default function CreateInvoicePage(){
     if(uni){
 
       form.setFieldValue(
+
         "currencyId",
+
         uni.defaultCurrencyId
+
       );
 
     }
@@ -137,6 +167,11 @@ export default function CreateInvoicePage(){
     loadPreview();
 
   };
+
+
+  /*
+  submit
+  */
 
   const handleSubmit = async(values:any)=>{
 
@@ -159,6 +194,7 @@ export default function CreateInvoicePage(){
           values.currencyId,
 
         exchangeRateToBase:
+
           values.exchangeRateToBase
             ? Number(values.exchangeRateToBase)
             : 1
@@ -175,31 +211,28 @@ export default function CreateInvoicePage(){
     catch(error:any){
 
       message.error(
-        error?.response?.data?.message ||
+
+        error?.response?.data?.message
+        ||
         "Error creating invoice"
+
       );
 
     }
 
   };
 
-  const baseCurrencyId =
-    universities.find(
-      u => u.id === form.getFieldValue("universityId")
-    )?.defaultCurrencyId;
+const baseCurrencyId =
+  universities.find(
+    u => u.id === form.getFieldValue("universityId")
+  )?.defaultCurrencyId;
+
 
   return(
 
     <AppLayout>
 
-      <Card
-
-        style={{
-          maxWidth: 700,
-          margin: "0 auto"
-        }}
-
-      >
+      <Card>
 
         <Space
 
@@ -226,6 +259,7 @@ export default function CreateInvoicePage(){
 
         </Space>
 
+
         <Form
 
           form={form}
@@ -238,22 +272,48 @@ export default function CreateInvoicePage(){
 
         >
 
+          {/* university */}
+
           <Form.Item
+
             label="University"
+
             name="universityId"
-            rules={[{ required:true }]}
+
+            rules={[
+
+              {
+
+                required:true,
+
+                message:"Select university"
+
+              }
+
+            ]}
+
           >
 
             <Select
+
               placeholder="Select University"
-              onChange={handleUniversityChange}
+
+              onChange={
+
+                handleUniversityChange
+
+              }
+
             >
 
               {universities.map(u=>(
 
                 <Select.Option
+
                   key={u.id}
+
                   value={u.id}
+
                 >
 
                   {u.name}
@@ -266,22 +326,48 @@ export default function CreateInvoicePage(){
 
           </Form.Item>
 
+
+          {/* period */}
+
           <Form.Item
+
             label="Period"
+
             name="period"
-            rules={[{ required:true }]}
+
+            rules={[
+
+              {
+
+                required:true,
+
+                message:"Select period"
+
+              }
+
+            ]}
+
           >
 
             <DatePicker.RangePicker
+
               style={{width:"100%"}}
+
             />
 
           </Form.Item>
 
+
+          {/* currency */}
+
           <Form.Item
+
             label="Invoice Currency"
+
             name="currencyId"
+
             rules={[{required:true}]}
+
           >
 
             <Select>
@@ -289,8 +375,11 @@ export default function CreateInvoicePage(){
               {currencies.map(c=>(
 
                 <Select.Option
+
                   key={c.id}
+
                   value={c.id}
+
                 >
 
                   {c.code} — {c.name}
@@ -303,146 +392,149 @@ export default function CreateInvoicePage(){
 
           </Form.Item>
 
+
+          {/* exchange */}
+
           <Form.Item
-            label="Exchange Rate"
-            name="exchangeRateToBase"
-            initialValue={1}
-            extra="1 USD equals how much in selected currency"
-          >
+  label="Exchange Rate"
+  name="exchangeRateToBase"
+  initialValue={1}
+  extra="كم تساوي 1 USD بالعملة المختارة"
+>
 
-            <InputNumber
+  <InputNumber
 
-              style={{width:"100%"}}
+    style={{width:"100%"}}
 
-              min={0.000001}
+    min={0.000001}
 
-              step={0.01}
+    step={0.01}
 
-              disabled={
-                form.getFieldValue("currencyId") === baseCurrencyId
-              }
+    disabled={
 
-            />
+      form.getFieldValue("currencyId") === baseCurrencyId
 
-          </Form.Item>
+    }
+
+  />
+
+</Form.Item>
+
+
+          {/* preview */}
 
           {preview && (
 
-            <Alert
+  <Alert
 
-              type="info"
+    type="info"
 
-              showIcon
+    showIcon
 
-              style={{
-                marginBottom:20
-              }}
+    message={
 
-              message={
+      <div>
 
-                <div>
+        <Text>
 
-                  <Text>
+          Sessions:
+          {" "}
+          {preview.sessionsCount}
 
-                    Sessions:
-                    {" "}
-                    {preview.sessionsCount}
+        </Text>
 
-                  </Text>
+        <br/>
 
-                  <br/>
+        <Text>
 
-                  <Text>
+          Activities:
+          {" "}
+          {preview.activitiesCount}
 
-                    Activities:
-                    {" "}
-                    {preview.activitiesCount}
+        </Text>
 
-                  </Text>
+        <br/><br/>
 
-                  <br/><br/>
+        {
 
-                  {
+          form.getFieldValue("currencyId") !== baseCurrencyId && (
 
-                    form.getFieldValue("currencyId") !== baseCurrencyId && (
+            <Text>
 
-                      <Text>
+              Exchange rate:
+              {" "}
+              1 USD =
 
-                        Exchange rate:
+              {" "}
 
-                        {" "}
+              <strong>
 
-                        1 USD =
+                {
 
-                        {" "}
+                  form.getFieldValue(
+                    "exchangeRateToBase"
+                  ) || 1
 
-                        <strong>
+                }
 
-                          {
+              </strong>
 
-                            form.getFieldValue(
-                              "exchangeRateToBase"
-                            ) || 1
+              {" "}
 
-                          }
+              {
 
-                        </strong>
+                currencies.find(
 
-                        {" "}
+                  c =>
+                    c.id ===
+                    form.getFieldValue("currencyId")
 
-                        {
-
-                          currencies.find(
-
-                            c => c.id ===
-                            form.getFieldValue("currencyId")
-
-                          )?.code
-
-                        }
-
-                      </Text>
-
-                    )
-
-                  }
-
-                  {
-
-                    form.getFieldValue("currencyId") !== baseCurrencyId && <br/>
-
-                  }
-
-                  <Text strong>
-
-                    Estimated invoice total:
-
-                    {" "}
-
-                    {
-
-                      Number(
-                        preview.convertedTotal
-                      ).toLocaleString()
-
-                    }
-
-                  </Text>
-
-                </div>
+                )?.code
 
               }
 
-            />
+            </Text>
 
-          )}
+          )
+
+        }
+
+        {
+
+          form.getFieldValue("currencyId") !== baseCurrencyId && <br/>
+
+        }
+
+        <Text strong>
+
+          Estimated invoice total:
+          {" "}
+
+          {Number(preview.convertedTotal).toLocaleString()}
+
+        </Text>
+
+      </div>
+
+    }
+
+    style={{ marginBottom:20 }}
+
+  />
+
+)}
+
+
+          {/* submit */}
 
           <Form.Item>
 
             <Button
+
               type="primary"
+
               htmlType="submit"
-              block={isMobile}
+
             >
 
               Create Invoice

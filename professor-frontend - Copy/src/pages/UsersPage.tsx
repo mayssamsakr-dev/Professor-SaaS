@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import AppLayout from "../layouts/AppLayout";
 import { userApi } from "../api/userApi";
-import { Grid } from "antd";
 
 import {
   Card,
@@ -14,10 +13,6 @@ import {
 } from "antd";
 
 export default function UsersPage() {
-
-  const screens = Grid.useBreakpoint();
-
-const isMobile = !screens.md;
 
   const [data, setData] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
@@ -82,34 +77,18 @@ const isMobile = !screens.md;
     <AppLayout>
 
       <Card
-
-  title="Users"
-
-  extra={
-
-    <Button
-
-      type="primary"
-
-      block={isMobile}
-
-      onClick={() => setOpen(true)}
-
-    >
-
-      Add User
-
-    </Button>
-
-  }
-
->
+        title="Users"
+        extra={
+          <Button type="primary" onClick={() => setOpen(true)}>
+            Add User
+          </Button>
+        }
+      >
 
         <Table
           dataSource={data}
           columns={columns}
           rowKey="id"
-          scroll={{ x:true }}
         />
 
       </Card>
