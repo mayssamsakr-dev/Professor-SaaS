@@ -95,7 +95,12 @@ export default function AppLayout({ children }: any) {
         }}
 
       >
-
+      <Link
+  to="/"
+  style={{
+    textDecoration:"none"
+  }}
+>
         <div
           style={{
             padding: 20,
@@ -106,6 +111,7 @@ export default function AppLayout({ children }: any) {
         >
           Professor SaaS
         </div>
+        </Link>
 
         <Menu
 

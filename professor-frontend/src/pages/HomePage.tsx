@@ -157,6 +157,8 @@ export default function HomePage(){
 
             <Button
 
+            block={isMobile}
+
               onClick={()=>
 
                 navigate("/login")
@@ -171,6 +173,8 @@ export default function HomePage(){
 
 
             <Button
+
+            block={isMobile}
 
               type="primary"
 
