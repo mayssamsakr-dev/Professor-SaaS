@@ -1,0 +1,199 @@
+### 1 Create Tenant
+
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{
+  "legalName": "Professor Company",
+  "email": "admin@test.com",
+  "password": "123456",
+  "fullName": "Admin",
+  "baseCurrency": "USD"
+}
+
+### 2 Create Owner User
+
+POST http://localhost:3000/users
+Content-Type: application/json
+
+{
+"email": "admin@test.com",
+"password": "123456",
+"fullName": "Admin User",
+"tenantId": 1
+}
+
+### 3 Login
+
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+"email": "admin@test.com",
+"password": "123456"
+}
+
+### 3 Create Plan
+POST http://localhost:3000/plans
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInRlbmFudElkIjoxLCJyb2xlIjoiT1dORVIiLCJpYXQiOjE3NzM0MzE1MzAsImV4cCI6MTc3MzUxNzkzMH0.80XnhmRUNiO_tde2rIqV_MlNC_zkAtPB9ByhUo9S4u4
+
+{
+  "name": "Monthly",
+  "priceMonthly": 20,
+  "currency": "USD",
+  "maxUniversities": 5,
+  "maxInvoices": 200
+}
+
+### 3 Create subscriptions
+POST http://localhost:3000/subscriptions
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInRlbmFudElkIjoxLCJyb2xlIjoiT1dORVIiLCJpYXQiOjE3NzM0MzE1MzAsImV4cCI6MTc3MzUxNzkzMH0.80XnhmRUNiO_tde2rIqV_MlNC_zkAtPB9ByhUo9S4u4
+Content-Type: application/json
+
+{
+  "tenantId": 1,
+  "planId": 1
+}
+
+### 4 Create University
+
+POST http://localhost:3000/universities
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInRlbmFudElkIjoxLCJyb2xlIjoiT1dORVIiLCJpYXQiOjE3NzM0MzE1MzAsImV4cCI6MTc3MzUxNzkzMH0.80XnhmRUNiO_tde2rIqV_MlNC_zkAtPB9ByhUo9S4u4
+Content-Type: application/json
+
+{
+  "name": "Beirut University",
+  "currency": "USD"
+}
+
+
+### 5 Create Subject
+
+POST http://localhost:3000/subjects
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInRlbmFudElkIjoxLCJyb2xlIjoiT1dORVIiLCJpYXQiOjE3NzM0MzE1MzAsImV4cCI6MTc3MzUxNzkzMH0.80XnhmRUNiO_tde2rIqV_MlNC_zkAtPB9ByhUo9S4u4
+Content-Type: application/json
+
+{
+"name": "Mathematics"
+}
+
+### 6 Create UniversitySubject
+
+POST http://localhost:3000/university-subjects
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInRlbmFudElkIjoxLCJyb2xlIjoiT1dORVIiLCJpYXQiOjE3NzM0MzE1MzAsImV4cCI6MTc3MzUxNzkzMH0.80XnhmRUNiO_tde2rIqV_MlNC_zkAtPB9ByhUo9S4u4
+Content-Type: application/json
+
+{
+"universityId": 1,
+"subjectId": 1,
+"ratePerSession": 100
+}
+
+### 7 Create Teaching Session
+
+POST http://localhost:3000/teaching-sessions
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInRlbmFudElkIjoxLCJyb2xlIjoiT1dORVIiLCJpYXQiOjE3NzM0MzE1MzAsImV4cCI6MTc3MzUxNzkzMH0.80XnhmRUNiO_tde2rIqV_MlNC_zkAtPB9ByhUo9S4u4
+Content-Type: application/json
+
+{
+"universitySubjectId": 1,
+"date": "2026-03-01",
+"quantity": 2
+}
+
+### 7 Delete Teaching Session
+DELETE http://localhost:3000/teaching-sessions/3
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInRlbmFudElkIjoxLCJyb2xlIjoiT1dORVIiLCJpYXQiOjE3NzM0MzE1MzAsImV4cCI6MTc3MzUxNzkzMH0.80XnhmRUNiO_tde2rIqV_MlNC_zkAtPB9ByhUo9S4u4
+
+### 7 Get Teaching Session
+GET http://localhost:3000/teaching-sessions
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInRlbmFudElkIjoxLCJyb2xlIjoiT1dORVIiLCJpYXQiOjE3NzM0MzE1MzAsImV4cCI6MTc3MzUxNzkzMH0.80XnhmRUNiO_tde2rIqV_MlNC_zkAtPB9ByhUo9S4u4
+
+### 8 Create Service Type
+
+POST http://localhost:3000/service-types
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInRlbmFudElkIjoxLCJyb2xlIjoiT1dORVIiLCJpYXQiOjE3NzM0MzE1MzAsImV4cCI6MTc3MzUxNzkzMH0.80XnhmRUNiO_tde2rIqV_MlNC_zkAtPB9ByhUo9S4u4
+Content-Type: application/json
+
+{
+"name": "Exam Correction"
+}
+
+### 9 Create Service Activity
+
+POST http://localhost:3000/service-activities
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInRlbmFudElkIjoxLCJyb2xlIjoiT1dORVIiLCJpYXQiOjE3NzM0MzE1MzAsImV4cCI6MTc3MzUxNzkzMH0.80XnhmRUNiO_tde2rIqV_MlNC_zkAtPB9ByhUo9S4u4
+Content-Type: application/json
+
+{
+  "date": "2026-03-10",
+  "unitRate": 50,
+  "quantity": 2,
+  "serviceTypeId": 1,
+  "universityId": 1
+}
+
+### 9 Delete Service Activity
+DELETE http://localhost:3000/service-activities/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInRlbmFudElkIjoxLCJyb2xlIjoiT1dORVIiLCJpYXQiOjE3NzM0MzE1MzAsImV4cCI6MTc3MzUxNzkzMH0.80XnhmRUNiO_tde2rIqV_MlNC_zkAtPB9ByhUo9S4u4
+
+### 7 Get Service Activity
+GET http://localhost:3000/service-activities
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInRlbmFudElkIjoxLCJyb2xlIjoiT1dORVIiLCJpYXQiOjE3NzM0MzE1MzAsImV4cCI6MTc3MzUxNzkzMH0.80XnhmRUNiO_tde2rIqV_MlNC_zkAtPB9ByhUo9S4u4
+
+### 10 Create Invoice
+
+POST http://localhost:3000/invoices
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInRlbmFudElkIjoxLCJyb2xlIjoiT1dORVIiLCJpYXQiOjE3NzM0MzE1MzAsImV4cCI6MTc3MzUxNzkzMH0.80XnhmRUNiO_tde2rIqV_MlNC_zkAtPB9ByhUo9S4u4
+Content-Type: application/json
+
+{
+"universityId": 1,
+"periodStart": "2026-03-01",
+"periodEnd": "2026-03-31",
+"currency": "USD",
+"exchangeRateToBase": 1
+}
+
+### 11 Finalize Invoice
+
+POST http://localhost:3000/invoices/1/finalize
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInRlbmFudElkIjoxLCJyb2xlIjoiT1dORVIiLCJpYXQiOjE3NzM0MzE1MzAsImV4cCI6MTc3MzUxNzkzMH0.80XnhmRUNiO_tde2rIqV_MlNC_zkAtPB9ByhUo9S4u4
+
+### 12 Generate PDF
+
+GET http://localhost:3000/invoices/1/pdf
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInRlbmFudElkIjoxLCJyb2xlIjoiT1dORVIiLCJpYXQiOjE3NzM0MzE1MzAsImV4cCI6MTc3MzUxNzkzMH0.80XnhmRUNiO_tde2rIqV_MlNC_zkAtPB9ByhUo9S4u4
+
+### Add Adjustments
+POST http://localhost:3000/invoices/1/adjustments
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInRlbmFudElkIjoxLCJyb2xlIjoiT1dORVIiLCJpYXQiOjE3NzM0MzE1MzAsImV4cCI6MTc3MzUxNzkzMH0.80XnhmRUNiO_tde2rIqV_MlNC_zkAtPB9ByhUo9S4u4
+Content-Type: application/json
+
+{
+  "type": "DISCOUNT",
+  "description": "Manual discount",
+  "amount": 50
+}
+### GET Report Summary
+GET http://localhost:3000/reports/summary
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInRlbmFudElkIjoxLCJyb2xlIjoiT1dORVIiLCJpYXQiOjE3NzM0MzE1MzAsImV4cCI6MTc3MzUxNzkzMH0.80XnhmRUNiO_tde2rIqV_MlNC_zkAtPB9ByhUo9S4u4
+
+### GET Report By University
+GET http://localhost:3000/reports/by-university
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInRlbmFudElkIjoxLCJyb2xlIjoiT1dORVIiLCJpYXQiOjE3NzM0MzE1MzAsImV4cCI6MTc3MzUxNzkzMH0.80XnhmRUNiO_tde2rIqV_MlNC_zkAtPB9ByhUo9S4u4
+
+### POST Payment
+POST http://localhost:3000/payments
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInRlbmFudElkIjoxLCJyb2xlIjoiT1dORVIiLCJpYXQiOjE3NzQwMjM0OTgsImV4cCI6MTc3NDEwOTg5OH0.facxlioSVTGQLUnCOLYJrBxn-aZA-HERB8I-i-UeCyM
+Content-Type: application/json
+
+{
+  "invoiceId": 1,
+  "amount": 0,
+  "amountBase": 0,
+  "paymentDate": "2026-03-19",
+  "method": "Cash",
+  "referenceNumber": "TEST123"
+}
