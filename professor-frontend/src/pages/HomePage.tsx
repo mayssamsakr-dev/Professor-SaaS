@@ -5,7 +5,8 @@ import {
   Row,
   Col,
   Card,
-  Space
+  Space,
+  Grid
 } from "antd";
 
 import {
@@ -30,6 +31,9 @@ const {
 } = Typography;
 
 export default function HomePage(){
+    const screens = Grid.useBreakpoint();
+
+  const isMobile = !screens.md;
 
   const navigate = useNavigate();
 
@@ -109,23 +113,27 @@ export default function HomePage(){
 
       <Header
 
-        style={{
+  style={{
 
-          background:"#fff",
+    background:"#fff",
 
-          display:"flex",
+    display:"flex",
 
-          justifyContent:"space-between",
+    justifyContent:"space-between",
 
-          alignItems:"center",
+    alignItems:"center",
 
-          padding:"0 40px",
+    padding: isMobile ? "0 16px" : "0 40px",
 
-          borderBottom:"1px solid #eee"
+    borderBottom:"1px solid #eee",
 
-        }}
+    flexWrap:"wrap",
 
-      >
+    gap:10
+
+  }}
+
+>
 
         <Title
           level={4}
@@ -139,7 +147,13 @@ export default function HomePage(){
 
         {!token ? (
 
-          <Space>
+          <Space
+
+  direction={isMobile ? "vertical" : "horizontal"}
+
+  style={{ width:"100%" }}
+
+>
 
             <Button
 
@@ -230,10 +244,20 @@ export default function HomePage(){
       {/* HERO */}
 
       <Content
-        style={{
-          padding:"60px 40px"
-        }}
-      >
+
+  style={{
+
+    padding:
+
+      isMobile
+
+        ? "40px 16px"
+
+        : "60px 40px"
+
+  }}
+
+>
 
         <Row justify="center">
 
@@ -285,6 +309,7 @@ export default function HomePage(){
                     type="primary"
 
                     size="large"
+                    block={isMobile}
 
                     onClick={()=>
 
@@ -304,6 +329,7 @@ export default function HomePage(){
                 <Button
 
                   size="large"
+                  block={isMobile}
 
                   onClick={()=>
 
@@ -329,7 +355,7 @@ export default function HomePage(){
         {/* FEATURES */}
 
         <Row
-          gutter={16}
+          gutter={[16,16]}
           style={{
             marginTop:60
           }}
