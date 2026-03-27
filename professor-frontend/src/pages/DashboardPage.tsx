@@ -3,25 +3,26 @@ import AppLayout from "../layouts/AppLayout";
 import { reportApi } from "../api/reportApi";
 
 import {
-  Card,
-  Row,
-  Col,
-  Typography,
-  DatePicker,
-  Button,
-  Space,
-  Alert,
-  Grid
+Card,
+Row,
+Col,
+Typography,
+DatePicker,
+Button,
+Space,
+Alert,
+Grid,
+Divider
 } from "antd";
 
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-  ResponsiveContainer
+LineChart,
+Line,
+XAxis,
+YAxis,
+Tooltip,
+CartesianGrid,
+ResponsiveContainer
 } from "recharts";
 
 import { formatCurrency } from "../utils/format";
@@ -29,254 +30,364 @@ import { formatCurrency } from "../utils/format";
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
 
-export default function DashboardPage() {
+export default function DashboardPage(){
 
-  const [summary, setSummary] = useState<any>(null);
-  const [monthly, setMonthly] = useState<any[]>([]);
-  const [byUniversity, setByUniversity] = useState<any[]>([]);
-  const [dates, setDates] = useState<any>(null);
+const [summary,setSummary] = useState<any[]>([]);
+const [monthly,setMonthly] = useState<any[]>([]);
+const [byUniversity,setByUniversity] = useState<any[]>([]);
+const [dates,setDates] = useState<any>(null);
 
-  const screens = Grid.useBreakpoint();
+const screens = Grid.useBreakpoint();
+const isMobile = !screens.md;
 
-  const isMobile = !screens.md;
+useEffect(()=>{
 
-  useEffect(() => {
-    loadData();
-  }, []);
+loadData();
 
-  const loadData = async (customDates?: any) => {
+},[]);
 
-    const d = customDates || dates;
 
-    let query = "";
+const loadData = async(customDates?:any)=>{
 
-    if (d) {
+const d = customDates || dates;
 
-      const from = d[0].format("YYYY-MM-DD");
-      const to = d[1].format("YYYY-MM-DD");
+let query = "";
 
-      query = `?dateFrom=${from}&dateTo=${to}`;
+if(d){
 
-    }
+const from = d[0].format("YYYY-MM-DD");
+const to = d[1].format("YYYY-MM-DD");
 
-    const s = await reportApi.getSummary(query);
-    const m = await reportApi.getMonthly(query);
-    const u = await reportApi.getByUniversity(query);
+query = `?dateFrom=${from}&dateTo=${to}`;
 
-    setSummary(s);
-    setMonthly(m);
-    setByUniversity(u);
+}
 
-  };
+const s = await reportApi.getSummary(query);
+const m = await reportApi.getMonthly(query);
+const u = await reportApi.getByUniversity(query);
 
-  const handleApply = () => loadData(dates);
+setSummary(s);
+setMonthly(m);
+setByUniversity(u);
 
-  const paidPercent = summary
-    ? (summary.paidRevenue / summary.totalRevenue) * 100
-    : 0;
+};
 
-  const avgInvoice = summary
-    ? summary.totalRevenue / (summary.invoiceCount || 1)
-    : 0;
 
-  const topUniversity = byUniversity.length
-    ? [...byUniversity].sort((a, b) => b.total - a.total)[0]
-    : null;
+const handleApply = ()=>loadData(dates);
 
-  const bestMonth = monthly.length
-    ? [...monthly].sort((a, b) => b.total - a.total)[0]
-    : null;
 
-  return (
+/*
+helpers
+*/
 
-    <AppLayout>
+const getPaidPercent = (item:any)=>{
 
-      <Title level={4}>Dashboard</Title>
+if(!item.totalRevenue) return 0;
 
-      <Card style={{ marginBottom: 20 }}>
+return (item.paidRevenue / item.totalRevenue) * 100;
 
-        <Space
+};
 
-          direction={isMobile ? "vertical" : "horizontal"}
+const getAvgInvoice = (item:any)=>{
 
-          style={{ width:"100%" }}
+if(!item.invoiceCount) return 0;
 
-        >
+return item.totalRevenue / item.invoiceCount;
 
-          <RangePicker
+};
 
-  onChange={(val)=>setDates(val)}
 
-  style={{
-    width: isMobile ? "100%" : undefined
-  }}
+
+/*
+top university per currency
+*/
+
+const topUniversityPerCurrency = summary.map((s)=>{
+
+const list = byUniversity.filter(
+u=>u.currencyCode === s.currencyCode
+);
+
+if(!list.length) return null;
+
+return {
+
+currencyCode:s.currencyCode,
+
+...list.sort((a,b)=>b.total-a.total)[0]
+
+};
+
+});
+ /*
+convert monthly data to single chart structure
+*/
+
+const monthlyPivot = Object.values(
+
+monthly.reduce((acc:any, item:any)=>{
+
+if(!acc[item.month]){
+
+acc[item.month] = {
+month:item.month
+};
+
+}
+
+acc[item.month][item.currencyCode] =
+item.total;
+
+return acc;
+
+},{}
+
+)
+
+);
+
+/*
+list currencies
+*/
+
+const currencies =
+summary.map(s=>s.currencyCode);
+
+return(
+
+<AppLayout>
+
+<Title level={4}>
+
+Dashboard
+
+</Title>
+
+
+{/* filter */}
+
+<Card style={{marginBottom:20}}>
+
+<Space
+
+direction={isMobile?"vertical":"horizontal"}
+
+style={{width:"100%"}}
+
+>
+
+<RangePicker
+
+onChange={(val)=>setDates(val)}
+
+style={{
+width:isMobile?"100%":undefined
+}}
 
 />
 
-          <Button
-            type="primary"
-            onClick={handleApply}
-            block={isMobile}
-          >
+<Button
 
-            Apply
+type="primary"
 
-          </Button>
+onClick={handleApply}
 
-        </Space>
+block={isMobile}
 
-      </Card>
+>
 
-      <Row gutter={[16,16]} style={{ marginBottom: 20 }}>
+Apply
 
-        <Col xs={24} sm={12} md={12} lg={6}>
+</Button>
 
-          <Card>
+</Space>
 
-            <Text>Total Revenue</Text>
+</Card>
 
-            <Title level={4}>
 
-              {summary
-                ? formatCurrency(summary.totalRevenue, "USD")
-                : "-"}
 
-            </Title>
+{/* KPIs */}
 
-          </Card>
+<Row gutter={[16,16]} style={{marginBottom:20}}>
 
-        </Col>
+{summary.map((s)=>(
+<Col key={s.currencyCode} xs={24} md={summary.length === 1 ? 24 : 12} lg={24 / summary.length}>
 
-        <Col xs={24} sm={12} md={12} lg={6}>
+<Card style={{height:"100%"}}>
 
-          <Card>
+<Title level={5}>
 
-            <Text>Paid %</Text>
+{s.currencyCode}
 
-            <Title level={4}>
+</Title>
 
-              {paidPercent.toFixed(1)}%
+<Divider style={{margin:"8px 0"}}/>
 
-            </Title>
+<Text>Total Revenue</Text>
 
-          </Card>
+<Title level={4}>
 
-        </Col>
+{formatCurrency(s.totalRevenue,s.currencyCode)}
 
-        <Col xs={24} sm={12} md={12} lg={6}>
+</Title>
 
-          <Card>
 
-            <Text>Outstanding</Text>
+<Text>Paid Revenue</Text>
 
-            <Title level={4}>
+<div>
 
-              {summary
-                ? formatCurrency(summary.unpaidRevenue, "USD")
-                : "-"}
+{formatCurrency(s.paidRevenue,s.currencyCode)}
 
-            </Title>
+</div>
 
-          </Card>
 
-        </Col>
+<Text>Outstanding</Text>
 
-        <Col xs={24} sm={12} md={12} lg={6}>
+<div>
 
-          <Card>
+{formatCurrency(s.unpaidRevenue,s.currencyCode)}
 
-            <Text>Avg Invoice</Text>
+</div>
 
-            <Title level={4}>
 
-              {formatCurrency(avgInvoice, "USD")}
+<Text>Invoice Count</Text>
 
-            </Title>
+<div>
 
-          </Card>
+{s.invoiceCount}
 
-        </Col>
+</div>
 
-      </Row>
 
-      <Row gutter={[16,16]} style={{ marginBottom: 20 }}>
+<Text>Avg Invoice</Text>
 
-        <Col xs={24} md={12}>
+<div>
 
-          <Card title="Top University">
+{formatCurrency(
+getAvgInvoice(s),
+s.currencyCode
+)}
 
-            {topUniversity
+</div>
 
-              ? `${topUniversity.universityName}
-                 (${formatCurrency(topUniversity.total, "USD")})`
 
-              : "No data"}
+<Text>Paid %</Text>
 
-          </Card>
+<div>
 
-        </Col>
+{getPaidPercent(s).toFixed(1)}%
 
-        <Col xs={24} md={12}>
+</div>
 
-          <Card title="Best Month">
+</Card>
 
-            {bestMonth
+</Col>
+))}
 
-              ? `${bestMonth.month}
-                 (${formatCurrency(bestMonth.total, "USD")})`
+</Row>
 
-              : "No data"}
 
-          </Card>
 
-        </Col>
+{/* university performance */}
 
-      </Row>
+<Row gutter={[16,16]} style={{marginBottom:20}}>
 
-      {summary && summary.unpaidRevenue > 0 && (
+{topUniversityPerCurrency.map((u)=>{
 
-        <Alert
+if(!u) return null;
 
-          type="warning"
+return(
 
-          message="Unpaid invoices detected"
+<Col key={u.currencyCode} xs={24} md={12}>
 
-          description={`Outstanding:
-            ${formatCurrency(summary.unpaidRevenue, "USD")}`}
+<Card title={`Top University (${u.currencyCode})`}>
 
-          style={{ marginBottom: 20 }}
+{u.universityName}
 
-        />
+<br/>
 
-      )}
+<strong>
 
-      <Card title="Revenue Trend">
+{formatCurrency(
+u.total,
+u.currencyCode
+)}
 
-        <ResponsiveContainer width="100%" height={300}>
+</strong>
 
-          <LineChart data={monthly}>
+</Card>
 
-            <CartesianGrid strokeDasharray="3 3" />
+</Col>
 
-            <XAxis dataKey="month" />
+);
 
-            <YAxis />
+})}
 
-            <Tooltip />
+</Row>
 
-            <Line
-              type="monotone"
-              dataKey="total"
-            />
 
-          </LineChart>
 
-        </ResponsiveContainer>
+{/* unpaid warning */}
 
-      </Card>
+{summary.some(s=>s.unpaidRevenue>0) && (
 
-    </AppLayout>
+<Alert
 
-  );
+type="warning"
+
+message="Unpaid invoices detected"
+
+style={{marginBottom:20}}
+
+/>
+
+)}
+
+
+
+{/* charts */}
+
+<Row>
+
+<Col xs={24}>
+
+<Card title="Revenue Trend">
+
+<ResponsiveContainer width="100%" height={320}>
+
+<LineChart data={monthlyPivot}>
+
+<CartesianGrid strokeDasharray="3 3"/>
+
+<XAxis dataKey="month"/>
+
+<YAxis/>
+
+<Tooltip/>
+
+{currencies.map((c)=>(
+
+<Line
+key={c}
+type="monotone"
+dataKey={c}
+/>
+
+))}
+
+</LineChart>
+
+</ResponsiveContainer>
+
+</Card>
+
+</Col>
+
+</Row>
+
+
+</AppLayout>
+
+);
 
 }

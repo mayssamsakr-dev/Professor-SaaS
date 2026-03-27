@@ -6,7 +6,6 @@ Modal,
 Form,
 Input,
 Space,
-Popconfirm,
 Typography,
 message
 } from "antd";
@@ -73,7 +72,7 @@ try{
 
 if(editing){
 
-await apiClient.patch(
+await apiClient.put(
 
 `/service-types/${editing.id}`,
 
@@ -127,6 +126,8 @@ delete
 
 const remove = async(id:number)=>{
 
+try{
+
 await apiClient.delete(
 
 `/service-types/${id}`
@@ -136,6 +137,15 @@ await apiClient.delete(
 message.success("Deleted");
 
 load();
+
+}
+catch(err:any){
+
+/*
+message already shown by interceptor
+*/
+
+}
 
 };
 
@@ -200,7 +210,35 @@ render:(row:any)=>(
 <Space>
 
 <Button
-onClick={()=>{
+
+onClick={async()=>{
+
+/*
+check if used in invoice
+*/
+
+const used = await apiClient.get(
+
+`/service-types/${row.id}/used-in-invoice`
+
+);
+
+
+if(used.data.used){
+
+Modal.confirm({
+
+title:"Warning",
+
+content:
+
+"Editing this service type will update its name in existing invoices.",
+
+okText:"Continue",
+
+cancelText:"Cancel",
+
+onOk:()=>{
 
 setEditing(row);
 
@@ -208,14 +246,30 @@ form.setFieldsValue(row);
 
 setOpen(true);
 
+}
+
+});
+
+}
+else{
+
+setEditing(row);
+
+form.setFieldsValue(row);
+
+setOpen(true);
+
+}
+
 }}
+
 >
 
 Edit
 
 </Button>
 
-<Popconfirm
+{/* <Popconfirm
 title="Delete?"
 onConfirm={()=>remove(row.id)}
 >
@@ -226,7 +280,39 @@ Delete
 
 </Button>
 
-</Popconfirm>
+</Popconfirm> */}
+
+<Button
+
+danger
+
+size="small"
+
+onClick={()=>{
+
+Modal.confirm({
+
+title:"Delete service type",
+
+content:"Delete only allowed if not used in invoices.",
+
+okText:"Delete",
+
+okButtonProps:{ danger:true },
+
+cancelText:"Cancel",
+
+onOk:()=>remove(row.id)
+
+});
+
+}}
+
+>
+
+Delete
+
+</Button>
 
 </Space>
 

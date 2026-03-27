@@ -6,7 +6,8 @@ import {
   Dropdown,
   Space,
   Button,
-  Grid
+  Grid,
+  Drawer
 } from "antd";
 
 import type { MenuProps } from "antd";
@@ -16,7 +17,6 @@ import { useState } from "react";
 import {
   DashboardOutlined,
   FileTextOutlined,
-  BarChartOutlined,
   BankOutlined,
   BookOutlined,
   AppstoreOutlined,
@@ -36,11 +36,14 @@ export default function AppLayout({ children }: any) {
 
   const screens = Grid.useBreakpoint();
 
-  const [collapsed, setCollapsed] = useState(!screens.md);
+  const isMobile = !screens.md;
+
+  const [collapsed, setCollapsed] = useState(false);
+
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const location = useLocation();
 
-  const isMobile = !screens.md;
 
   const userMenu: MenuProps = {
 
@@ -74,33 +77,17 @@ export default function AppLayout({ children }: any) {
 
   };
 
-  return (
 
-    <Layout style={{ minHeight: "100vh" }}>
+  /*
+  sidebar menu
+  */
 
-      <Sider
+  const menu = (
 
-        breakpoint="md"
+    <>
 
-        collapsedWidth={isMobile ? 0 : 80}
+      <Link to="/" style={{ textDecoration: "none" }}>
 
-        collapsed={isMobile ? collapsed : false}
-
-        trigger={null}
-
-        width={250}
-
-        style={{
-          background: "#0f172a",
-        }}
-
-      >
-      <Link
-  to="/"
-  style={{
-    textDecoration:"none"
-  }}
->
         <div
           style={{
             padding: 20,
@@ -109,102 +96,204 @@ export default function AppLayout({ children }: any) {
             fontSize: 18
           }}
         >
+
           Professor SaaS
+
         </div>
-        </Link>
 
-        <Menu
+      </Link>
 
-          theme="dark"
 
-          mode="inline"
+      <Menu
 
-          selectedKeys={[location.pathname]}
+        theme="dark"
+
+        mode="inline"
+
+        selectedKeys={[location.pathname]}
+
+        style={{
+
+          background: "#0f172a",
+
+          borderRight: 0,
+          height:"100%"
+
+        }}
+
+        onClick={() => {
+
+          if (isMobile) {
+
+            setMobileOpen(false);
+
+          }
+
+        }}
+
+        items={[
+
+          {
+            key: "/dashboard",
+            icon: <DashboardOutlined />,
+            label: <Link to="/dashboard">Dashboard</Link>
+          },
+
+          {
+            key: "/invoices",
+            icon: <FileTextOutlined />,
+            label: <Link to="/invoices">Invoices</Link>
+          },
+
+          { type: "divider" },
+
+          {
+            key: "/universities",
+            icon: <BankOutlined />,
+            label: <Link to="/universities">Universities</Link>
+          },
+
+          {
+            key: "/subjects",
+            icon: <BookOutlined />,
+            label: <Link to="/subjects">Subjects</Link>
+          },
+
+          {
+            key: "/university-subjects",
+            icon: <AppstoreOutlined />,
+            label: <Link to="/university-subjects">University Subjects</Link>
+          },
+
+          {
+            key: "/teaching-sessions",
+            icon: <CalendarOutlined />,
+            label: <Link to="/teaching-sessions">Teaching Sessions</Link>
+          },
+
+          { type: "divider" },
+
+          {
+            key: "/service-types",
+            icon: <ToolOutlined />,
+            label: <Link to="/service-types">Service Types</Link>
+          },
+
+          {
+            key: "/service-activities",
+            icon: <ToolOutlined />,
+            label: <Link to="/service-activities">Service Activities</Link>
+          },
+
+          { type: "divider" },
+
+          {
+            key: "/users",
+            icon: <UserOutlined />,
+            label: <Link to="/users">Users</Link>
+          }
+
+        ]}
+
+      />
+
+    </>
+
+  );
+
+
+  return (
+
+    <Layout style={{ minHeight: "100vh" }}>
+
+
+      {/* desktop sidebar */}
+
+      {!isMobile && (
+
+        <Sider
+
+          collapsible
+
+          collapsed={collapsed}
+
+          onCollapse={setCollapsed}
+
+          width={250}
 
           style={{
-            background: "#0f172a",
-            borderRight: 0
-          }}
 
-          onClick={()=>{
-            if(isMobile){
-              setCollapsed(true);
-            }
+            background: "#0f172a"
+
           }}
 
         >
 
-          <Menu.Item key="/dashboard" icon={<DashboardOutlined />}>
+          {menu}
 
-            <Link to="/dashboard">Dashboard</Link>
+        </Sider>
 
-          </Menu.Item>
+      )}
 
-          <Menu.Item key="/invoices" icon={<FileTextOutlined />}>
 
-            <Link to="/invoices">Invoices</Link>
 
-          </Menu.Item>
+      {/* mobile drawer */}
 
-          <Menu.Item key="/reports" icon={<BarChartOutlined />}>
+      {isMobile && (
 
-            <Link to="/reports">Reports</Link>
+        // <Drawer
 
-          </Menu.Item>
+        //   open={mobileOpen}
 
-          <Menu.Divider />
+        //   onClose={() => setMobileOpen(false)}
 
-          <Menu.Item key="/universities" icon={<BankOutlined />}>
+        //   placement="left"
 
-            <Link to="/universities">Universities</Link>
+        //   bodyStyle={{ padding: 0 }}
 
-          </Menu.Item>
+        //   width={250}
 
-          <Menu.Item key="/subjects" icon={<BookOutlined />}>
+        // >
 
-            <Link to="/subjects">Subjects</Link>
+        //   {menu}
 
-          </Menu.Item>
+        // </Drawer>
+        <Drawer
 
-          <Menu.Item key="/university-subjects" icon={<AppstoreOutlined />}>
+  open={mobileOpen}
 
-            <Link to="/university-subjects">University Subjects</Link>
+  onClose={() => setMobileOpen(false)}
 
-          </Menu.Item>
+  placement="left"
 
-          <Menu.Item key="/teaching-sessions" icon={<CalendarOutlined />}>
+  width={250}
 
-            <Link to="/teaching-sessions">Teaching Sessions</Link>
+  styles={{
 
-          </Menu.Item>
+    body:{
+      padding:0,
+      background:"#0f172a"
+    },
 
-          <Menu.Divider />
+    header:{
+      display:"none"
+    }
 
-          <Menu.Item key="/service-types" icon={<ToolOutlined />}>
+  }}
+        
 
-            <Link to="/service-types">Service Types</Link>
+>
+  {menu}
+</Drawer>
 
-          </Menu.Item>
+      )}
 
-          <Menu.Item key="/service-activities" icon={<ToolOutlined />}>
 
-            <Link to="/service-activities">Service Activities</Link>
-
-          </Menu.Item>
-
-          <Menu.Divider />
-
-          <Menu.Item key="/users" icon={<UserOutlined />}>
-
-            <Link to="/users">Users</Link>
-
-          </Menu.Item>
-
-        </Menu>
-
-      </Sider>
 
       <Layout>
+
+
+        {/* header */}
 
         <Header
 
@@ -230,6 +319,7 @@ export default function AppLayout({ children }: any) {
 
           <Space size="middle">
 
+
             {isMobile && (
 
               <Button
@@ -238,11 +328,12 @@ export default function AppLayout({ children }: any) {
 
                 icon={<MenuOutlined />}
 
-                onClick={() => setCollapsed(!collapsed)}
+                onClick={() => setMobileOpen(true)}
 
               />
 
             )}
+
 
             <Search
 
@@ -256,11 +347,15 @@ export default function AppLayout({ children }: any) {
 
             />
 
+
           </Space>
+
+
 
           <Space size="middle">
 
             <BellOutlined style={{ fontSize: 18 }} />
+
 
             <Dropdown menu={userMenu}>
 
@@ -272,9 +367,13 @@ export default function AppLayout({ children }: any) {
 
             </Dropdown>
 
+
           </Space>
 
+
         </Header>
+
+
 
         <Content
 
@@ -289,6 +388,7 @@ export default function AppLayout({ children }: any) {
           }}
 
         >
+
 
           <div
 
@@ -312,9 +412,12 @@ export default function AppLayout({ children }: any) {
 
           </div>
 
+
         </Content>
 
+
       </Layout>
+
 
     </Layout>
 

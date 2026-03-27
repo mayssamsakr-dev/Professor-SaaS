@@ -433,45 +433,47 @@ export class InvoiceService {
 
         include: {
 
-          university: true,
+  currency:true,   // <-- أضف هذا السطر
 
-          teachingSessions: {
+  university:true,
 
-            include: {
+  teachingSessions:{
 
-              universitySubject: {
+    include:{
 
-                include: {
+      universitySubject:{
 
-                  subject: true,
+        include:{
 
-                  university: true
+          subject:true,
 
-                }
-
-              }
-
-            }
-
-          },
-
-          serviceActivities: {
-
-            include: {
-
-              serviceType: true,
-
-              university: true
-
-            }
-
-          },
-
-          payments: true,
-
-          adjustments: true
+          university:true
 
         }
+
+      }
+
+    }
+
+  },
+
+  serviceActivities:{
+
+    include:{
+
+      serviceType:true,
+
+      university:true
+
+    }
+
+  },
+
+  payments:true,
+
+  adjustments:true
+
+}
 
       });
 

@@ -6,7 +6,6 @@ import InvoicesPage from "../pages/InvoicesPage";
 import ProtectedRoute from "./ProtectedRoute";
 import CreateInvoicePage from "../pages/CreateInvoicePage";
 import InvoiceDetailsPage from "../pages/InvoiceDetailsPage";
-import ReportsPage from "../pages/ReportsPage";
 import UniversitiesPage from "../pages/UniversitiesPage";
 import SubjectsPage from "../pages/SubjectsPage";
 import UniversitySubjectsPage from "../pages/UniversitySubjectsPage";
@@ -81,15 +80,6 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <InvoiceDetailsPage />
-      </ProtectedRoute>
-    )
-  },
-
-  {
-    path: "/reports",
-    element: (
-      <ProtectedRoute>
-        <ReportsPage />
       </ProtectedRoute>
     )
   },

@@ -34,98 +34,191 @@ export class ReportsService {
 
   async revenueSummary(tenantId: number, dateFrom?: string, dateTo?: string) {
 
-    const invoices = await this.prisma.invoice.findMany({
-      where: {
-        tenantId,
-        status: 'FINALIZED', // مهم
-        ...this.buildDateFilter(dateFrom, dateTo)
-      }
-    });
+  const invoices = await this.prisma.invoice.findMany({
 
-    const totalRevenue = invoices.reduce(
-      (sum, i) => sum + Number(i.totalAmount),
-      0
-    );
+    where:{
+      tenantId,
+      status:'FINALIZED',
+      ...this.buildDateFilter(dateFrom,dateTo)
+    },
 
-    const paid = invoices
-      .filter(i => i.paymentStatus === PaymentStatus.PAID)
-      .reduce((sum, i) => sum + Number(i.totalAmount), 0);
+    include:{
+      currency:true
+    }
 
-    const unpaid = invoices
-      .filter(i => i.paymentStatus !== PaymentStatus.PAID)
-      .reduce((sum, i) => sum + Number(i.totalAmount), 0);
+  });
 
-    return {
-      totalRevenue,
-      paidRevenue: paid,
-      unpaidRevenue: unpaid,
-      invoiceCount: invoices.length
-    };
 
-  }
+  const map:any = {};
 
-  async revenueByUniversity(tenantId: number, dateFrom?: string, dateTo?: string) {
 
-    const invoices = await this.prisma.invoice.findMany({
-      where: {
-        tenantId,
-        status: 'FINALIZED',
-        ...this.buildDateFilter(dateFrom, dateTo)
-      },
-      include: { university: true }
-    });
+  for(const inv of invoices){
 
-    const map: Record<string, number> = {};
+    const code = inv.currency.code;
 
-    for (const inv of invoices) {
+    if(!map[code]){
 
-      const name = inv.university.name;
+      map[code] = {
 
-      if (!map[name]) {
-        map[name] = 0;
-      }
+        currencyCode:code,
 
-      map[name] += Number(inv.totalAmount);
+        totalRevenue:0,
+
+        paidRevenue:0,
+
+        unpaidRevenue:0,
+
+        invoiceCount:0
+
+      };
 
     }
 
-    // تحويل إلى Array (مهم)
-    return Object.entries(map).map(([universityName, total]) => ({
-      universityName,
-      total
-    }));
 
-  }
+    map[code].totalRevenue += Number(inv.totalAmount);
 
-  async monthlyRevenue(tenantId: number, dateFrom?: string, dateTo?: string) {
+    map[code].invoiceCount += 1;
 
-    const invoices = await this.prisma.invoice.findMany({
-      where: {
-        tenantId,
-        status: 'FINALIZED',
-        ...this.buildDateFilter(dateFrom, dateTo)
-      }
-    });
 
-    const map: Record<string, number> = {};
+    if(inv.paymentStatus === PaymentStatus.PAID){
 
-    for (const inv of invoices) {
+      map[code].paidRevenue += Number(inv.totalAmount);
 
-      const month = new Date(inv.issueDate).toISOString().slice(0, 7);
+    }
+    else{
 
-      if (!map[month]) {
-        map[month] = 0;
-      }
-
-      map[month] += Number(inv.totalAmount);
+      map[code].unpaidRevenue += Number(inv.totalAmount);
 
     }
 
-    return Object.entries(map).map(([month, total]) => ({
-      month,
-      total
-    }));
-
   }
+
+
+  return Object.values(map);
+
+}
+
+  async revenueByUniversity(
+
+tenantId:number,
+
+dateFrom?:string,
+
+dateTo?:string
+
+){
+
+const invoices = await this.prisma.invoice.findMany({
+
+where:{
+tenantId,
+status:'FINALIZED',
+...this.buildDateFilter(dateFrom,dateTo)
+},
+
+include:{
+university:true,
+currency:true
+}
+
+});
+
+
+const map:any = {};
+
+
+for(const inv of invoices){
+
+const key =
+inv.university.name + "_" + inv.currency.code;
+
+
+if(!map[key]){
+
+map[key] = {
+
+universityName:inv.university.name,
+
+currencyCode:inv.currency.code,
+
+total:0
+
+};
+
+}
+
+
+map[key].total += Number(inv.totalAmount);
+
+}
+
+
+return Object.values(map);
+
+}
+
+  async monthlyRevenue(
+
+tenantId:number,
+
+dateFrom?:string,
+
+dateTo?:string
+
+){
+
+const invoices = await this.prisma.invoice.findMany({
+
+where:{
+tenantId,
+status:'FINALIZED',
+...this.buildDateFilter(dateFrom,dateTo)
+},
+
+include:{
+currency:true
+}
+
+});
+
+
+const map:any = {};
+
+
+for(const inv of invoices){
+
+const month =
+new Date(inv.issueDate)
+.toISOString()
+.slice(0,7);
+
+
+const key =
+month + "_" + inv.currency.code;
+
+
+if(!map[key]){
+
+map[key] = {
+
+month,
+
+currencyCode:inv.currency.code,
+
+total:0
+
+};
+
+}
+
+
+map[key].total += Number(inv.totalAmount);
+
+}
+
+
+return Object.values(map);
+
+}
 
 }
