@@ -59,24 +59,24 @@ export class InvoiceController {
   /*
   preview totals
   */
-  @Get("preview")
-  preview(
+  // @Get("preview")
+  // preview(
 
-    @Query() query:any,
+  //   @Query() query:any,
 
-    @Req() req:any
+  //   @Req() req:any
 
-  ){
+  // ){
 
-    return this.invoiceService.preview(
+  //   return this.invoiceService.preview(
 
-      query,
+  //     query,
 
-      req.user.tenantId
+  //     req.user.tenantId
 
-    );
+  //   );
 
-  }
+  // }
 
   /*
   جميع الفواتير
@@ -265,5 +265,30 @@ export class InvoiceController {
     );
 
   }
+
+  @Get(":id/preview")
+preview(
+
+@Param("id") id:string,
+
+@Req() req:any,
+
+@Res() res:Response
+
+){
+
+return this.invoicePdfService.generate(
+
+Number(id),
+
+req.user.tenantId,
+
+res,
+
+true
+
+);
+
+}
 
 }

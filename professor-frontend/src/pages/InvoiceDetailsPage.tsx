@@ -442,6 +442,38 @@ Finalize
 Download PDF
 
 </Button>
+<Button
+onClick={async()=>{
+
+const res = await apiClient.get(
+
+`/invoices/${invoice.id}/preview`,
+
+{
+responseType:"blob"
+}
+
+);
+
+const file = new Blob(
+
+[res.data],
+
+{ type:"application/pdf" }
+
+);
+
+const url =
+URL.createObjectURL(file);
+
+window.open(url,"_blank");
+
+}}
+>
+
+Preview
+
+</Button>
 
 </Space>
 
