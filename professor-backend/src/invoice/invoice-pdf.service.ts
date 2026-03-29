@@ -164,15 +164,14 @@ university:true,
 tenant:true,
 
 teachingSessions:{
-
-include:{
-universitySubject:{
-include:{
-subject:true
-}
-}
-}
-
+  include:{
+    universitySubject:{
+      include:{
+        subject:true
+      }
+    },
+    classGroup:true
+  }
 },
 
 serviceActivities:{
@@ -232,10 +231,10 @@ res.setHeader(
 
 if(preview){
 
-res.setHeader(
-"Content-Disposition",
-"inline"
-);
+  res.setHeader(
+    "Content-Disposition",
+    `inline; filename=invoice-${invoice.invoiceNumber}.pdf`
+  );
 
 }else{
 
@@ -354,35 +353,35 @@ y+10
 
 );
 
-labelValue(
+// labelValue(
 
-doc,
+// doc,
 
-"Exchange Rate",
+// "Exchange Rate",
 
-"1 "
-+
-symbol
-+
-" = "
-+
-numberFormat(
-Number(
-invoice.exchangeRateToBase
-)
-)
-+
-" "
-+
-currencyCode,
+// "1 "
+// +
+// symbol
+// +
+// " = "
+// +
+// numberFormat(
+// Number(
+// invoice.exchangeRateToBase
+// )
+// )
+// +
+// " "
+// +
+// currencyCode,
 
-300,
+// 300,
 
-y+30
+// y+30
 
-);
+// );
 
-y+=95;
+y+=80;
 
 /*
 UNIVERSITY
@@ -497,7 +496,7 @@ y+63
 
 );
 
-y+=115;
+y+=100;
 
 /*
 PROFESSOR
@@ -513,7 +512,7 @@ y,
 
 530,
 
-115
+90
 
 );
 
@@ -614,7 +613,7 @@ y+60
 
 );
 
-y+=135;
+y+=120;
 
 /*
 teaching sessions
@@ -636,15 +635,12 @@ y
 y+=20;
 
 const teachingCols=[
-
-{label:"Date",x:50,w:100},
-
-{label:"Subject",x:150,w:180},
-
-{label:"Rate",x:330,w:100,align:"right"},
-
-{label:"Total",x:430,w:120,align:"right"}
-
+{label:"Date",x:50,w:90},
+{label:"Subject",x:140,w:150},
+{label:"Class",x:250,w:100},
+{label:"Qty",x:325,w:50,align:"right"},
+{label:"Rate",x:400,w:60,align:"right"},
+{label:"Total",x:470,w:70,align:"right"}
 ];
 
 tableHeader(
@@ -691,58 +687,38 @@ y+textY,
 );
 
 doc.text(
-
-s.universitySubject
-.subject.name,
-
-150,
-
+s.universitySubject.subject.name,
+140,
 y+textY,
-
-{width:180}
-
+{width:150}
 );
 
 doc.text(
-
-money(
-
-Number(s.unitRate),
-
-symbol
-
-),
-
-330,
-
+s.classGroup?.name || "",
+170,
 y+textY,
-
-{
-width:100,
-align:"right"
-}
-
+{width:100,align:"right"}
 );
 
 doc.text(
-
-money(
-
-Number(s.totalAmount),
-
-symbol
-
-),
-
-430,
-
+numberFormat(Number(s.quantity)),
+320,
 y+textY,
+{width:50,align:"right"}
+);
 
-{
-width:120,
-align:"right"
-}
+doc.text(
+money(Number(s.unitRate),symbol),
+400,
+y+textY,
+{width:60,align:"right"}
+);
 
+doc.text(
+money(Number(s.totalAmount),symbol),
+470,
+y+textY,
+{width:70,align:"right"}
 );
 
 doc
@@ -795,13 +771,10 @@ y
 y+=20;
 
 const serviceCols=[
-
 {label:"Date",x:50,w:100},
-
-{label:"Service",x:150,w:230},
-
-{label:"Amount",x:430,w:120,align:"right"}
-
+{label:"Service",x:150,w:200},
+{label:"Qty",x:300,w:80,align:"right"},
+{label:"Total",x:420,w:120,align:"right"}
 ];
 
 tableHeader(
@@ -848,36 +821,24 @@ y+textY,
 );
 
 doc.text(
-
 a.serviceType?.name||"",
-
 150,
-
 y+textY,
-
-{width:230}
-
+{width:200}
 );
 
 doc.text(
-
-money(
-
-Number(a.totalAmount),
-
-symbol
-
-),
-
-430,
-
+numberFormat(Number(a.quantity||1)),
+295,
 y+textY,
+{width:80,align:"right"}
+);
 
-{
-width:120,
-align:"right"
-}
-
+doc.text(
+money(Number(a.totalAmount),symbol),
+420,
+y+textY,
+{width:120,align:"right"}
 );
 
 doc
@@ -910,6 +871,13 @@ total box
 
 y+=30;
 
+y =
+ensureSpace(
+  doc,
+  y,
+  140
+);
+
 box(
 
 doc,
@@ -920,7 +888,7 @@ y,
 
 250,
 
-115
+80
 
 );
 
@@ -948,11 +916,9 @@ symbol
 
 ),
 
-470,
-
+430,
 y+10,
-
-{align:"right"}
+{width:120,align:"right"}
 
 );
 
@@ -976,11 +942,9 @@ symbol
 
 ),
 
-470,
-
+430,
 y+30,
-
-{align:"right"}
+{width:120,align:"right"}
 
 );
 
@@ -993,31 +957,16 @@ doc
 .fontSize(12);
 
 doc.text(
-
 "TOTAL",
-
 330,
-
-y+55
-
+y+50
 );
 
 doc.text(
-
-money(
-
-Number(invoice.totalAmount),
-
-symbol
-
-),
-
-470,
-
-y+55,
-
-{align:"right"}
-
+money(Number(invoice.totalAmount),symbol),
+430,
+y+50,
+{width:120,align:"right"}
 );
 
 /*

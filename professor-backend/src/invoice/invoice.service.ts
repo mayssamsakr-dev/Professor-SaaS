@@ -1253,28 +1253,38 @@ async preview(
 ){
 
   const sessions =
-    await this.prisma.teachingSession.findMany({
+await this.prisma.teachingSession.findMany({
 
-      where:{
+  where:{
 
-        tenantId,
+    tenantId,
 
-        invoiceId:null,
+    invoiceId:null,
 
-        deletedAt:null,
+    deletedAt:null,
 
-        date:{
-          gte:new Date(query.periodStart),
-          lte:new Date(query.periodEnd)
-        },
+    date:{
+      gte:new Date(query.periodStart),
+      lte:new Date(query.periodEnd)
+    },
 
-        universitySubject:{
-          universityId:Number(query.universityId)
-        }
+    universitySubject:{
+  is:{
+    universityId:Number(query.universityId)
+  }
+}
 
-      }
+  },
 
-    });
+  include:{
+
+    classGroup:true
+
+  }
+
+});
+
+
 
 
   const activities =
@@ -1298,6 +1308,7 @@ async preview(
       }
 
     });
+
 
 
   /*

@@ -166,6 +166,12 @@ export default function AppLayout({ children }: any) {
           },
 
           {
+            key: "/class-groups",
+            icon: <AppstoreOutlined />,
+            label: <Link to="/class-groups">Class Groups</Link>
+          },
+
+          {
             key: "/teaching-sessions",
             icon: <CalendarOutlined />,
             label: <Link to="/teaching-sessions">Teaching Sessions</Link>

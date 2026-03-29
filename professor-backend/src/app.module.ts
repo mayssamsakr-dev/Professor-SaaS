@@ -22,6 +22,7 @@ import { SubscriptionModule } from './subscription/subscription.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ReportsModule } from './reports/reports.module';
 import { CurrencyModule } from "./currency/currency.module";
+import { ClassGroupModule } from "./class-group/class-group.module";
 
 
 
@@ -51,6 +52,7 @@ import { CurrencyModule } from "./currency/currency.module";
     SubscriptionModule,
     ReportsModule,
     CurrencyModule,
+    ClassGroupModule,
   ],
   controllers: [TestController],
 providers: [

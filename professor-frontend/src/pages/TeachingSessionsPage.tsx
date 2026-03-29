@@ -4,6 +4,7 @@ import AppLayout from "../layouts/AppLayout";
 import { teachingSessionApi } from "../api/teachingSessionApi";
 import { universitySubjectApi } from "../api/universitySubjectApi";
 import { universityApi } from "../api/universityApi";
+import { classGroupApi } from "../api/classGroupApi";
 
 import { formatDate } from "../utils/format";
 import dayjs from "dayjs";
@@ -26,12 +27,13 @@ export default function TeachingSessionsPage() {
 
   const screens = Grid.useBreakpoint();
 
-const isMobile = !screens.md;
+  const isMobile = !screens.md;
 
   const [data, setData] = useState<any[]>([]);
 
   const [universities, setUniversities] = useState<any[]>([]);
   const [links, setLinks] = useState<any[]>([]);
+  const [classes, setClasses] = useState<any[]>([]);
 
   const [loading, setLoading] = useState(false);
 
@@ -67,13 +69,13 @@ const isMobile = !screens.md;
 
     } catch (error:any) {
 
-  const msg =
-    error?.response?.data?.message
-    || "Request failed";
+      const msg =
+        error?.response?.data?.message
+        || "Request failed";
 
-  message.error(msg);
+      message.error(msg);
 
-}
+    }
 
     setLoading(false);
 
@@ -95,6 +97,40 @@ const isMobile = !screens.md;
 
     setLinks(res);
 
+    setClasses([]);
+
+    form.setFieldValue(
+      "classGroupId",
+      undefined
+    );
+
+  };
+
+  /*
+  تحميل الصفوف حسب المادة
+  */
+  const loadClasses = async (
+
+    universitySubjectId:number
+
+  ) => {
+
+    const all =
+      await classGroupApi.getAll();
+
+    const filtered =
+      all.filter(c =>
+        c.universitySubject.id
+        === universitySubjectId
+      );
+
+    setClasses(filtered);
+
+    form.setFieldValue(
+      "classGroupId",
+      undefined
+    );
+
   };
 
   /*
@@ -108,12 +144,14 @@ const isMobile = !screens.md;
 
     setLinks([]);
 
+    setClasses([]);
+
     setModalOpen(true);
 
   };
 
   /*
-  edit confirmation
+  edit
   */
   const openEdit = (record: any) => {
 
@@ -140,7 +178,7 @@ const isMobile = !screens.md;
 
       cancelText: "Cancel",
 
-      onOk() {
+      onOk: async () => {
 
         setEditing(record);
 
@@ -148,7 +186,13 @@ const isMobile = !screens.md;
           record.universitySubject
             .university.id;
 
-        loadLinks(universityId);
+        await loadLinks(
+          universityId
+        );
+
+        await loadClasses(
+          record.universitySubjectId
+        );
 
         form.setFieldsValue({
 
@@ -156,6 +200,9 @@ const isMobile = !screens.md;
 
           universitySubjectId:
             record.universitySubjectId,
+
+          classGroupId:
+            record.classGroupId,
 
           quantity:
             record.quantity,
@@ -187,6 +234,9 @@ const isMobile = !screens.md;
 
         universitySubjectId:
           values.universitySubjectId,
+
+        classGroupId:
+          values.classGroupId,
 
         quantity:
           values.quantity,
@@ -241,7 +291,7 @@ const isMobile = !screens.md;
   };
 
   /*
-  delete confirmation
+  delete
   */
   const handleDelete = (record: any) => {
 
@@ -309,7 +359,6 @@ const isMobile = !screens.md;
 
       render: (v: string) =>
         formatDate(v)
-
     },
 
     {
@@ -317,7 +366,6 @@ const isMobile = !screens.md;
 
       render: (_: any, r: any) =>
         r.universitySubject?.university?.name
-
     },
 
     {
@@ -325,28 +373,31 @@ const isMobile = !screens.md;
 
       render: (_: any, r: any) =>
         r.universitySubject?.subject?.name
+    },
 
+    {
+      title: "Class",
+
+      render: (_: any, r: any) =>
+        r.classGroup?.name
     },
 
     {
       title: "Qty",
 
       dataIndex: "quantity"
-
     },
 
     {
       title: "Rate",
 
       dataIndex: "unitRate"
-
     },
 
     {
       title: "Total",
 
       dataIndex: "totalAmount"
-
     },
 
     {
@@ -385,19 +436,25 @@ const isMobile = !screens.md;
 
       <Space
 
-  direction={isMobile ? "vertical" : "horizontal"}
+        direction={
 
-  style={{
+          isMobile
+            ? "vertical"
+            : "horizontal"
 
-    width:"100%",
+        }
 
-    justifyContent:"space-between",
+        style={{
 
-    marginBottom:20
+          width:"100%",
 
-  }}
+          justifyContent:"space-between",
 
->
+          marginBottom:20
+
+        }}
+
+      >
 
         <h2>
 
@@ -486,7 +543,9 @@ const isMobile = !screens.md;
             rules={[{ required: true }]}
           >
 
-            <Select>
+            <Select
+              onChange={loadClasses}
+            >
 
               {links.map(l => (
 
@@ -496,6 +555,31 @@ const isMobile = !screens.md;
                 >
 
                   {l.subject.name}
+
+                </Select.Option>
+
+              ))}
+
+            </Select>
+
+          </Form.Item>
+
+          <Form.Item
+            label="Class"
+            name="classGroupId"
+            rules={[{ required: true }]}
+          >
+
+            <Select>
+
+              {classes.map(c => (
+
+                <Select.Option
+                  key={c.id}
+                  value={c.id}
+                >
+
+                  {c.name}
 
                 </Select.Option>
 

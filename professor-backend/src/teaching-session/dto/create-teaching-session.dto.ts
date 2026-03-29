@@ -12,4 +12,7 @@ export class CreateTeachingSessionDto {
   @IsInt()
   universitySubjectId: number;
 
+  @IsInt()
+classGroupId: number;
+
 }

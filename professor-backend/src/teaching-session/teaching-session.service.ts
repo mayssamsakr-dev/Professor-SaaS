@@ -12,40 +12,77 @@ export class TeachingSessionService extends BaseTenantService {
 
   async create(dto: CreateTeachingSessionDto, tenantId: number) {
 
-    const universitySubject = await this.prisma.universitySubject.findFirst({
-      where: {
-        id: dto.universitySubjectId,
-        tenantId,
-      },
-    });
+  const universitySubject = await this.prisma.universitySubject.findFirst({
+    where: {
+      id: dto.universitySubjectId,
+      tenantId,
+    },
+  });
 
-    if (!universitySubject) {
-      throw new BadRequestException('UniversitySubject not found');
-    }
-
-    const unitRate = Number(universitySubject.ratePerSession);
-    const quantity = Number(dto.quantity);
-    const totalAmount = quantity * unitRate;
-
-    return this.prisma.teachingSession.create({
-      data: {
-        date: new Date(dto.date),
-        quantity,
-        unitRate,
-        totalAmount,
-        universitySubjectId: dto.universitySubjectId,
-        tenantId,
-      },
-      include: {
-        universitySubject: {
-          include: {
-            university: true,
-            subject: true,
-          },
-        },
-      },
-    });
+  if (!universitySubject) {
+    throw new BadRequestException('UniversitySubject not found');
   }
+
+  // تحقق أن الصف مرتبط بنفس universitySubject
+  const classGroup = await this.prisma.classGroup.findFirst({
+    where: {
+      id: dto.classGroupId,
+      universitySubjectId: dto.universitySubjectId,
+      tenantId
+    }
+  });
+
+  if (!classGroup) {
+    throw new BadRequestException('Invalid class group for selected subject');
+  }
+
+  const unitRate = Number(universitySubject.ratePerSession);
+
+  const quantity = Number(dto.quantity);
+
+  const totalAmount = quantity * unitRate;
+
+  return this.prisma.teachingSession.create({
+
+    data: {
+
+      date: new Date(dto.date),
+
+      quantity,
+
+      unitRate,
+
+      totalAmount,
+
+      universitySubjectId: dto.universitySubjectId,
+
+      classGroupId: dto.classGroupId,
+
+      tenantId,
+
+    },
+
+    include: {
+
+      universitySubject: {
+
+        include: {
+
+          university: true,
+
+          subject: true,
+
+        },
+
+      },
+
+      classGroup: true
+
+    },
+
+  });
+
+}
 
   async findAll(tenantId: number) {
 
@@ -55,14 +92,24 @@ export class TeachingSessionService extends BaseTenantService {
         deletedAt: null
       },
       include: {
-        universitySubject: {
-          include: {
-            university: true,
-            subject: true,
-          },
-        },
-        invoice: true,
-      },
+
+  universitySubject: {
+
+    include: {
+
+      university: true,
+
+      subject: true,
+
+    },
+
+  },
+
+  classGroup: true,
+
+  invoice: true,
+
+},
       orderBy: {
         date: 'desc',
       },
@@ -164,6 +211,32 @@ async update(
 
   }
 
+  // تحقق classGroup
+  const classGroup =
+    await this.prisma.classGroup.findFirst({
+
+      where: {
+
+        id: dto.classGroupId,
+
+        universitySubjectId: dto.universitySubjectId,
+
+        tenantId
+
+      }
+
+    });
+
+  if (!classGroup) {
+
+    throw new BadRequestException(
+
+      "Invalid class group for selected subject"
+
+    );
+
+  }
+
   const unitRate =
     Number(universitySubject.ratePerSession);
 
@@ -192,7 +265,10 @@ async update(
       totalAmount,
 
       universitySubjectId:
-        dto.universitySubjectId
+        dto.universitySubjectId,
+
+      classGroupId:
+        dto.classGroupId
 
     },
 
@@ -208,7 +284,9 @@ async update(
 
         }
 
-      }
+      },
+
+      classGroup: true
 
     }
 

@@ -17,6 +17,7 @@ import RegisterPage from "../pages/RegisterPage";
 import HomePage from "../pages/HomePage";
 import SubscriptionPage from "../pages/SubscriptionPage";
 import ProfilePage from "../pages/ProfilePage";
+import ClassGroupsPage from "../pages/ClassGroupsPage";
 
 export const router = createBrowserRouter([
 
@@ -53,6 +54,15 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <DashboardPage />
+      </ProtectedRoute>
+    )
+  },
+
+  {
+    path: "/class-groups",
+    element: (
+      <ProtectedRoute>
+        <ClassGroupsPage />
       </ProtectedRoute>
     )
   },
